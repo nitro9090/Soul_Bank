@@ -1,0 +1,6 @@
+checking 1 6000.0
+growth 2 3000.0
+invest 3 2000.0
+growth 4 4300.0
+checking 5 6000.0
+JoeBob invest 2 0.0

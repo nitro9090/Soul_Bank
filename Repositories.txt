@@ -1,0 +1,5 @@
+JoeBob 1 checking 2000.0
+JoeBob 3 invest 1000.0
+JoeBob 4 growth 1000.0
+JoeBob 2 checking 0.0
+JoeBob 3 invest 0.0
