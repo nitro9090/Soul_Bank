@@ -5,7 +5,7 @@ public class UserInputMethods {
 
 	public static String scanStr(String userName){
 		String scanVal = sc.nextLine();
-		ExitMethods.exitComm(scanVal, userName);
+		ExitMethods.exitNormal(scanVal, userName);
 		clearConsole();
 		String Output = scanVal;
 		return Output;
@@ -14,7 +14,7 @@ public class UserInputMethods {
 	public static int scanInt(String userName){
 		int Output = 0;
 		String scanVal = sc.nextLine();
-		ExitMethods.exitComm(scanVal, userName);
+		ExitMethods.exitNormal(scanVal, userName);
 		clearConsole();
 		try{
 			Output = Integer.parseInt(scanVal);
@@ -26,7 +26,7 @@ public class UserInputMethods {
 	public static Double scanDbl(String userName){
 		Double Output = -1.0;
 		String scanVal = sc.nextLine();
-		ExitMethods.exitComm(scanVal, userName);
+		ExitMethods.exitNormal(scanVal, userName);
 		clearConsole();
 		try{
 			Output = Double.parseDouble(scanVal);

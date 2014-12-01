@@ -3,7 +3,7 @@ import java.util.ArrayList;
 public class LoginMethods {
 	public static void newCust(){
 		Boolean test = false;
-		ArrayList<customerInfo.Customer> customers = CustMethods.loadCustomers();
+		ArrayList<customerInfo.Customer> customers = ReadWriteFile.loadCustomers();
 		String inUserName = null;
 		String inPassword = null;
 		String inFirstName = null;
@@ -73,8 +73,8 @@ public class LoginMethods {
 		String filename= "Customers.txt";
 		String FileData = inUserName + " " + inPassword + " " + inFirstName + " " + inLastName;
 		
-		WriteToFile.appendToFile(filename, FileData);
-		WriteToFile.recordAction(inUserName, "NewAccount", "");
+		ReadWriteFile.appendToFile(filename, FileData);
+		ReadWriteFile.recordAction(inUserName, "NewAccount", "");
 
 		System.out.println("Thank you for your soul, please press enter to login with your new account");
 	}
@@ -82,7 +82,7 @@ public class LoginMethods {
 	public static String Login(){
 		
 		boolean passwordCorrect = false;
-		ArrayList<customerInfo.Customer> customers = CustMethods.loadCustomers();
+		ArrayList<customerInfo.Customer> customers = ReadWriteFile.loadCustomers();
 		UserInputMethods.scanClear();
 		String inUserName = null;
 		String inPassword;
@@ -98,14 +98,14 @@ public class LoginMethods {
 				if (inUserName.equals(customers.get(i).getUserName())){
 					if (inPassword.equals(customers.get(i).getPassword())){
 						passwordCorrect = true;
-						WriteToFile.recordAction(inUserName, "Login", "");
+						ReadWriteFile.recordAction(inUserName, "Login", "");
 						System.out.println("Welcome to super awesome fun time.");
 					}
 				}
 			}
 			if(passwordCorrect == false){
 				System.out.println("Username and/or password do not match or exist, try again.");
-				WriteToFile.recordAction(inUserName, "FailedLogin", "");
+				ReadWriteFile.recordAction(inUserName, "FailedLogin", "");
 			}
 		}
 		return inUserName;

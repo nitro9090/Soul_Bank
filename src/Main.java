@@ -44,7 +44,7 @@ public class Main {
     		ExitMethods.exitCommBad();
     	}
     	
-    	Customer customer = CustMethods.loadCustomerFull(userName);
+    	Customer customer = ReadWriteFile.loadCustomerFull(userName);
     	
     	System.out.println("Welcome to the main menu, what would you like to do?");
     	

@@ -1,22 +1,18 @@
 
 public class ExitMethods {
-	public static void exit(){
-		System.out.println("Goodbye, for now...");
-		System.exit(0);
-	}
-	
-	public static void exitComm(String value, String userName){
+	public static void exitNormal(String value, String userName){
 		if(value.equals("escape")){
 			if (!userName.equals(null)){
-				WriteToFile.recordAction(userName, "NormalLogout", "");
+				ReadWriteFile.recordAction(userName, "NormalLogout", "");
 			}
-			exit();
+			System.out.println("Goodbye, for now...");
+			System.exit(0);
 		}
 	}
 	
 	public static void exitCommBad(){
 		System.out.println("You have been bad, now begone.");
-		WriteToFile.recordAction("null", "BadLogin", "Reached mainmenu without a username");
+		ReadWriteFile.recordAction("null", "BadLogin", "Reached mainmenu without a username");
 		System.exit(0);
 	}
 }
