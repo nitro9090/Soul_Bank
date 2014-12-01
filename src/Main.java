@@ -31,7 +31,7 @@ public class Main {
     			userName = LoginMethods.Login();
     			return userName;
     		default:
-    			System.out.println("please choose again.");
+    			invSelect();
     		}
     	}
     	return userName;
@@ -86,7 +86,7 @@ public class Main {
     		case 6:
     			exit = true;
     		default:
-    			System.out.print("please choose again, your options are \n");
+    			invSelect();
     		}
     	}
     	exit = false;
@@ -95,5 +95,12 @@ public class Main {
 	private static void backMain() {
 		System.out.println("Welcome back to the main menu, your options are:");
 	}
-
+	
+	public static void invSelect(){
+		System.out.println("Invalid Selection!");
+	}
+	
+	public static void invAmt(){
+		System.out.println("Invalid Amount!");
+	}
 }

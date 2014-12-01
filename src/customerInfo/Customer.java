@@ -70,39 +70,39 @@ public class Customer{
 		return repositories;
 	}
 	
-	public Repositories getRep(int acctNum){
-		int acctPos = findRepPos(acctNum);
-		return repositories.get(acctPos);
+	public Repositories getRep(int repNum){
+		int repPos = findRepPos(repNum);
+		return repositories.get(repPos);
 	}
 	
-	public String getRepType(int acctNum){
-		int acctPos = findRepPos(acctNum);
-		return repositories.get(acctPos).getRepType();
+	public String getRepType(int repNum){
+		int repPos = findRepPos(repNum);
+		return repositories.get(repPos).getRepType();
 	}
 	
-	public int getRepNum(int acctPos){
-		return repositories.get(acctPos).getRepNum();
+	public int getRepNum(int repPos){
+		return repositories.get(repPos).getRepNum();
 	}
 	
-	public double getRepBal(int acctNum){
-		int acctPos = findRepPos(acctNum);
-		return repositories.get(acctPos).getRepBal();
+	public double getRepBal(int repNum){
+		int repPos = findRepPos(repNum);
+		return repositories.get(repPos).getRepBal();
 	}
 	
-	public double setRepBal(int acctNum, Double newBal){
-		int acctPos = findRepPos(acctNum);
-		return repositories.get(acctPos).setRepBal(newBal);
+	public double setRepBal(int repNum, Double newBal){
+		int repPos = findRepPos(repNum);
+		return repositories.get(repPos).setRepBal(newBal);
 	}
 	
-	public int findRepPos(int acctNum) {
-		int acctPos = -1;
-		int acctSize = repositories.size();
+	public int findRepPos(int repNum) {
+		int repPos = -1;
+		int repSize = repositories.size();
 
-		for(int i = 0; i < acctSize; i++){
-			if(repositories.get(i).getRepNum() == acctNum){
+		for(int i = 0; i < repSize; i++){
+			if(repositories.get(i).getRepNum() == repNum){
 				return i;
 			}
 		}
-		return acctPos;
+		return repPos;
 	}
 }

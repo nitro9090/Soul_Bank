@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 
 import customerInfo.Customer;
+import customerInfo.Donations;
 
 public class MainMethods extends Main {
 	
@@ -30,7 +31,7 @@ public class MainMethods extends Main {
     			exit = true;
     			break breakWhile;
     		default:
-    			System.out.println("please choose again, your options are");
+    			invSelect();
     		}
     	}
     	if(finalTrans == true) exit = false;
@@ -47,15 +48,18 @@ public class MainMethods extends Main {
 
 		breakWhile:
 		while (exit == false){
-			System.out.println("Which account balance would you like to check");
-			listReps(customer, -1, -1, -1);
+			System.out.println("Your account balances are:");
+			listReps(customer, -1, -1, -1, true);
 
 			System.out.printf("(%d) Return to previous menu \n", RepSize+1);
+			
+			System.out.println("Choose an account to see its recent activity.");
 
 			int choice = UserInputMethods.scanInt(customer.getUserName());
 
 			for(int i = 0; i< RepSize; i++){
 				if(choice == i+1){
+					// need to add recent activity
 					MainMethods.checkBalPrompt(customer.getRepNum(i), customer);
 					break breakWhile;
 				}
@@ -64,9 +68,7 @@ public class MainMethods extends Main {
 				exit = true;
 				break breakWhile;
 			}
-			else{
-				System.out.println("Invalid Choice, please choose again.");
-			}
+			else invSelect();
 		}
 		if (finalTrans == true) exit = false;
 	}
@@ -104,7 +106,7 @@ public class MainMethods extends Main {
 				exit = true;
 				break breakWhile;
 			default:
-				System.out.println("please choose again.");
+				invSelect();
 			}
 		}
 		if(finalTrans == true) exit = false;
@@ -120,8 +122,8 @@ public class MainMethods extends Main {
 			exit = true;
 		}
 	
-		int repNumTo = chooseRepPrompt(customer, false, "Which repository would you like to transfer souls to?");
-		int repNumFrom = choose2ndRepPrompt(customer, false, repNumTo, "Which repository would you like to transfer souls from?");
+		int repNumTo = chooseRepPrompt(customer, false, true, "Which repository would you like to transfer souls to?");
+		int repNumFrom = choose2ndRepPrompt(customer, false, false, repNumTo, "Which repository would you like to transfer souls from?");
 		double transVal = amtToTransPrompt(customer, action, repNumTo, customer, repNumFrom, customer);
 		customer = actionDoubleCheck(customer, action, finalTrans, transVal, repNumTo, customer, repNumFrom, customer, null);
 		
@@ -137,7 +139,7 @@ public class MainMethods extends Main {
 			exit = true;
 		}
 		
-		int repNumTo = chooseRepPrompt(customer, false, "Which repository would you like to deposit your souls?" );
+		int repNumTo = chooseRepPrompt(customer, false, true, "Which repository would you like to deposit your souls?" );
 		double transVal = amtToTransPrompt(customer, action, repNumTo, customer, -1,  null);
 		customer = actionDoubleCheck(customer, action, finalTrans, transVal, repNumTo, customer, -1, null, null);
 		
@@ -153,7 +155,7 @@ public class MainMethods extends Main {
 			exit = true;
 		}
 		
-		int repNumFrom = chooseRepPrompt(customer, false, "Which repository would you like to extract souls from?" );
+		int repNumFrom = chooseRepPrompt(customer, false, false, "Which repository would you like to extract souls from?" );
 		double transVal = amtToTransPrompt(customer, action, -1, null, repNumFrom,  customer);
 		customer = actionDoubleCheck(customer, action, finalTrans, transVal, -1, null, repNumFrom, customer, null);
 		
@@ -191,7 +193,7 @@ public class MainMethods extends Main {
 			else if (transVal > customerFrom.getRepBal(repNumFrom)){
 				System.out.println("You do not have enough souls in your account, please give a different amount.");
 			}
-			else System.out.println("That is an invalid amount, we are not pleased. Try again.");
+			else invAmt();
 		}	
 		return transVal;
 	}
@@ -218,7 +220,7 @@ public class MainMethods extends Main {
 				exit = true;
 				break breakWhile;
 			default:
-				System.out.println("please choose again.");
+				invSelect();
 			}
 		}
 		if(finalTrans == true) exit = false;
@@ -234,11 +236,19 @@ public class MainMethods extends Main {
 			exit = true;
 		}
 		
-		int delRepNum = chooseRepPrompt(customer, false, "Which repository would you like to close?");
+		int delRepNum = chooseRepPrompt(customer, false, true, "Which repository would you like to close?");
 		customer = repHasSoul(customer, delRepNum);
 		customer = actionDoubleCheck(customer, action, finalTrans, 0, -1, null, delRepNum, customer, null);
 		
 		return customer;
+	}
+
+	public static Customer deleteCust(Customer customer, boolean finalTrans) {
+		where to work next
+		while (exit == false){
+			System.out.println("You are about to close your customer account, aka delete it forever.");
+			System.out.println("Are you sure you wish to do this?");
+		}
 	}
 
 	private static Customer repHasSoul(Customer customer, int closingRepNum){
@@ -258,7 +268,7 @@ public class MainMethods extends Main {
 				if (repSize == 0) System.out.println("Note, you are attempting to close your final account.");
 				System.out.println("You may either: ");
 				if (repSize != 0) System.out.println("Transfer all of the souls to the below accounts.");
-				listReps(customer, closingRepNum, 0, 0);
+				listReps(customer, closingRepNum, 0, 0, true);
 				System.out.printf("(%d) Extract all of the souls\n", repSize+1);
 				System.out.printf("(%d) Create a new repository and move all of the souls into it\n", repSize+2);
 				System.out.printf("(%d) Donate all of the souls to the Dark Ones\n", repSize+3);
@@ -321,9 +331,7 @@ public class MainMethods extends Main {
 					exit = true;
 					break;
 				}
-				else if(check == false){
-					System.out.println("Invalid Choice, please choose again.");
-				}
+				else if(check == false) invSelect();
 			}
 			if (customer.getRepBal(closingRepNum) == 0) exit = false;
 		}
@@ -354,7 +362,7 @@ public class MainMethods extends Main {
 					exit = true;
 					break breakWhile;
 				default:
-					System.out.println("please choose again.");
+					invSelect();
 				}
 			}
 	if(finalTrans == true) exit = false;
@@ -366,23 +374,53 @@ public class MainMethods extends Main {
 		
 		System.out.println("You would like money, the root of all evil...");
 		System.out.println("This can be granted, but at a high price and we are fickle.");
-		System.out.println("How much will you give up for it?");
+		System.out.println("How much are you willing to donate to the dark ones for it?");
 		
-		donations = amtToDonate(customer);
+		donations = amtToDonate(customer, false);
+		customer = dealDoubleCheck(customer, true, "Money", donations);
 		
 		return customer;
 	}
 	
-	private static ArrayList<Donations> amtToDonate(Customer customer){
+	private static Customer powerDealPrompt(Customer customer, boolean finalTrans) {
+		ArrayList<Donations> donations = new ArrayList<>();
+		
+		System.out.println("You would like power, that which requires great responsibility");
+		System.out.println("To gain or bestow such is difficult, you best be prepared donate");
+		System.out.println("How much are you willing to donate to the dark ones for it?");
+		
+		donations = amtToDonate(customer, false);
+		customer = dealDoubleCheck(customer, true, "Power", donations);
+		
+		return customer;
+	}
+
+	private static Customer loveDealPrompt(Customer customer, boolean finalTrans) {
+		ArrayList<Donations> donations = new ArrayList<>();
+		
+		System.out.println("You wish to find love, a noble pursuit for such a lowly creature.");
+		System.out.println("This is the hardest task known, the dark ones will expect much.");
+		System.out.println("How much are you willing to donate to the dark ones for it?");
+		
+		donations = amtToDonate(customer, false);
+		customer = dealDoubleCheck(customer, true, "Love", donations);
+		
+		return customer;
+	}
+
+	private static ArrayList<Donations> amtToDonate(Customer customer, boolean finalTrans){
 		ArrayList<Donations> donations = new ArrayList<>();
 		boolean moreToAdd = true;
 		
 		while(moreToAdd == true && exit == false){
-			int repNumDonate = chooseRepPrompt(customer, false, "Which repository would you like to donate from?  You may take from more than one.");
+			int repNumDonate = chooseRepPrompt(customer, false, false, "Which repository would you like to donate from?  You may take from more than one.");
 			double newDonAmt = amtToTransPrompt(customer, "Donate", -1, null, repNumDonate, customer);
 			
 			if(exit == false){
-				Donations temp = new Donations(repNumDonate,newDonAmt);
+				double origBal = customer.getRepBal(repNumDonate);
+				customer.setRepBal(repNumDonate, origBal - newDonAmt);
+				
+				Donations temp = new Donations(repNumDonate, newDonAmt);
 				donations.add(temp);
 			}
 			
@@ -396,48 +434,31 @@ public class MainMethods extends Main {
 					moreToAdd = false;
 					break;
 				}
-				else{
-					System.out.println("invalid choice");
-				}
 			}
 		}
+		if(finalTrans == true) exit = false;
 		return donations;
 	}
 	
-	static Customer dealDoubleCheck(Customer customer, String action, boolean finalTrans, ArrayList<Donations> donations){
+	static Customer dealDoubleCheck(Customer customer, boolean finalTrans, String action,  ArrayList<Donations> donations){
 		double transVal = 0;
 		
 		for(int i=0; i < donations.size();i++){
 			transVal = transVal + donations.get(i).getDonAmt();
 		}
-			
 		
 		breakWhile:
 		while (exit == false){
-			if(action.equals("Donate")){
-				System.out.println("After transferring " + transVal + " souls, your account totals will be");
-				System.out.printf("account %d %s : %.2f souls     account %d %s : %.2f souls \n", repNumFrom, customerFrom.getRepType(repNumFrom), customerFrom.getRepBal(repNumFrom)-transVal, repNumTo, customerTo.getRepType(repNumTo), customerTo.getRepBal(repNumTo)+transVal);
+			if(action.equals("Money") || action.equals("Power") || action.equals("Love")){
+				for(int i = 0; i < donations.size(); i++){
+					System.out.println("You are donating " + donations.get(i).getDonAmt() + " souls from account # " + donations.get(i).getRepNum() + " " + customer.getRepType(donations.get(i).getRepNum()));
+				}
+				System.out.println("For a total donation of " + transVal + " souls in order to gain " + action + "." );
 				System.out.println("Are you sure you want to do this? type (Y) for yes or (N) for no.");
-			}
-			else if(action.equals("Deposit")){
-				System.out.println("After depositing " + transVal + " souls, your account total will be");
-				System.out.printf("account %d %s : %.2f souls \n", repNumTo, customerTo.getRepType(repNumTo), customerTo.getRepBal(repNumTo)+transVal);
-				System.out.println("Are you sure you want to do this? type (Y) for yes or (N) for no.");
-			}
-			else if(action.equals("Extract")){
-				System.out.println("After extracting " + transVal + " souls, your account total will be");
-				System.out.printf("account %d %s : %.2f souls \n", repNumFrom, customerFrom.getRepType(repNumFrom), customerFrom.getRepBal(repNumFrom)-transVal);
-				System.out.println("Are you sure you want to do this? type (Y) for yes or (N) for no.");
-			}
-			else if(action.equals("NewRep")){
-				System.out.println("Are you sure you want to open a new Soul " + repType + " account? type (Y) for yes or (N) for no.");
-			}
-			else if (action.equals("CloseRep")){
-				System.out.println("You will now be closing " + customerFrom.getUserName() + "'s account # : " + repNumFrom + " soul " + customerFrom.getRepType(repNumFrom));
-				System.out.println("Are you sure you want to do this? type (Y) for yes or (N) for no.");
+				System.out.println("Be careful what you wish for.");
 			}
 			else{
-				System.out.println("Error: action double check wasn't accessed properly");
+				System.out.println("Error: deal double check wasn't accessed properly");
 				exit = true;
 				break breakWhile;
 			}
@@ -445,41 +466,32 @@ public class MainMethods extends Main {
 			String isYN = CheckMethods.doubleCheck(customer);
 			
 			if(isYN.equals("Y")){
-				if(action.equals("Transfer")){
-					customer = transSouls(customer, customerTo, customerFrom, repNumTo, repNumFrom, transVal);
+				customer = processTheDeal(customer, donations, action);
+				if(action.equals("Money")){	
+					//moneyDealResults(transVal);
 				}
-				else if(action.equals("Deposit")){
-					customer = depSouls(customerTo, repNumTo, transVal);
+				else if(action.equals("Power")){
+					//powerDealResults(transVal);
 				}
-				else if(action.equals("Extract")){
-					customer = extractSouls(customerFrom, repNumFrom, transVal);
+				else if(action.equals("Love")){
+					//loveDealResults(transVal);
 				}
-				else if (action.equals("NewRep")){
-					customer = newRepos(customer, customerTo.getUserName(), repType, 0);
-				}
-				else if(action.equals("CloseRep")){
-					customer = deleteRepos(customer, customerFrom, repNumFrom);
-				}
-				else if(action.equals("DonateMoney"))
 				break breakWhile;
 			}
 			else if(isYN.equals("N")){
+				System.out.println("Your donation has been cancelled.");
 				exit = true;
 			}	
 		}
+		if(finalTrans == true) exit = false;
 		return customer;
 	}
-	
 
-	private static Customer powerDealPrompt(Customer customer,
-			boolean finalTrans) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private static Customer loveDealPrompt(Customer customer, boolean finalTrans) {
-		// TODO Auto-generated method stub
-		return null;
+	private static Customer processTheDeal(Customer customer, ArrayList<Donations> donations, String transType) {
+		for(int i = 0; i < donations.size(); i++){
+			customer = donateSouls(customer, donations.get(i).getRepNum(), donations.get(i).getDonAmt(), transType);
+		}	
+		return customer;
 	}
 
 	static Customer actionDoubleCheck(Customer customer, String action, boolean finalTrans, double transVal, int repNumTo, Customer customerTo, int repNumFrom, Customer customerFrom, String repType){
@@ -531,7 +543,6 @@ public class MainMethods extends Main {
 				else if(action.equals("CloseRep")){
 					customer = deleteRepos(customer, customerFrom, repNumFrom);
 				}
-				else if(action.equals("DonateMoney"))
 				break breakWhile;
 			}
 			else if(isYN.equals("N")){
@@ -540,27 +551,6 @@ public class MainMethods extends Main {
 		}
 		return customer;
 	}
-
-	
-	
-	/*public static void transCompl(String transType){
-		if (transType.equals("Transfer")){
-			System.out.println("Your transfer is complete.");
-		}
-		else if (transType.equals("Deposit")){
-			System.out.println("Your deposit is complete.");
-		}
-		else if (transType.equals("Extract") ){
-			System.out.println("Your extraction is complete.");
-		}
-		else if(transType.equals("NewRep")){
-			// output is within new repository action
-		}
-		else if (transType.equals("CloseRep")){
-			System.out.println("The dark ones appreciate your business.");
-		}
-		System.out.println("You will be returned to the main menu.");
-	}*/
 
 	private static Customer depSouls(Customer customer, int repNum,  double transVal){
 		customer = ReadWriteFile.transferSouls(customer, repNum, -1, transVal, true, false);
@@ -582,6 +572,16 @@ public class MainMethods extends Main {
 		customer = ReadWriteFile.transferSouls(customer, repNumTo, repNumFrom, transVal, true, true);
 		ReadWriteFile.recordAction(customer.getUserName(), "Transfer", repNumFrom + " " + customerFrom.getRepType(repNumFrom) + "-->" + transVal + "-->" + repNumTo + " " + customerTo.getRepType(repNumTo));
 		System.out.println(transVal + " souls have been transfered between " + customer.getUserName() + "'s accounts.");
+		
+		return customer;
+	}
+	
+	private static Customer donateSouls(Customer customer, int repNum, double transVal, String transType){
+		customer = ReadWriteFile.transferSouls(customer, -1, repNum, transVal, false, true);
+		//need to add section that adds values to the dark ones account.
+		ReadWriteFile.donateToDarkOnes(customer, transVal);
+		ReadWriteFile.recordAction(customer.getUserName(), "Donate" + transType, repNum + " " + customer.getRepType(repNum) + " --> " + transVal + " --> The Dark Ones");
+		System.out.println(transVal + " souls have been donated from " + customer.getUserName() + "'s " + repNum + " " + customer.getRepType(repNum) +  " account.");
 		
 		return customer;
 	}
@@ -615,7 +615,7 @@ public class MainMethods extends Main {
 	}
 
 
-	private static int chooseRepPrompt(Customer customer, boolean finalTrans, String question){
+	private static int chooseRepPrompt(Customer customer, boolean finalTrans, boolean inclEmptReps, String question){
 		int repSize = customer.getRep().size();
 		int repNum = -1;
 		boolean check = false;
@@ -623,14 +623,19 @@ public class MainMethods extends Main {
 		breakWhile:
 		while (exit == false){
 			System.out.println(question);
-			listReps(customer, -1, -1, -1);
+			listReps(customer, -1, -1, -1, inclEmptReps);
 			System.out.printf("(%d) Cancel the transaction \n", repSize+1);
 	
 			int choice = UserInputMethods.scanInt(customer.getUserName());
 	
 			for(int j = 0; j < repSize; j++){
-				if(choice == j+1){
-					repNum = customer.getRepNum(j);
+				int repNumList = customer.getRepNum(j);
+				if(inclEmptReps == false && choice == j+1 && customer.getRepBal(repNumList) == 0){
+					invSelect();
+					check = true;
+				}
+				else if(choice == j+1){
+					repNum = repNumList;
 					break breakWhile;
 				}
 			}
@@ -638,27 +643,37 @@ public class MainMethods extends Main {
 				System.out.println("You are being returned to the main menu.");
 				exit = true;
 			}
-			else if(check == false){
-				System.out.println("Invalid selection!");
-			}
+			else if(check == false) invSelect();
 		}
+		if(finalTrans == true) exit = false;
 		return repNum;
 	}
 
-	private static int choose2ndRepPrompt(Customer customer, boolean finalTrans, int firstRepNum, String question) {
+	private static int choose2ndRepPrompt(Customer customer, boolean finalTrans, boolean inclEmptReps, int firstRepNum, String question) {
 		int repNum = -1;
 		int repSize = customer.getRep().size();
+		boolean check = false;
 	
 		while (exit == false){
 			System.out.println(question);
-			listReps(customer, firstRepNum, -1, -1);
+			int countReps = listReps(customer, firstRepNum, -1, -1, inclEmptReps);
 	
+			if (countReps == 0){
+				System.out.println("This transaction is not possible with these accounts.");
+				exit = true;
+				break;
+			}
+			
 			System.out.printf("(%d) Cancel the transfer \n", repSize+1);
 	
 			int choice = UserInputMethods.scanInt(customer.getUserName());
 	
 			for(int j = 0; j< repSize; j++){ 
 				int repNumList = customer.getRepNum(j);
+				if(inclEmptReps == false && choice == j+1 && customer.getRepBal(repNumList) == 0){
+					invSelect();
+					check = true;
+				}
 				if(choice == j+1 && repNumList != firstRepNum && customer.getRepBal(repNumList) != 0){
 					return repNum = customer.getRepNum(j);
 				}
@@ -667,36 +682,37 @@ public class MainMethods extends Main {
 				System.out.println("You are being returned to the previous menu.");
 				exit = true;
 			}
-			else {
-				System.out.println("Invalid selection");
-			}
+			else if(check == false) invSelect();
 		}
+		if(finalTrans == true) exit = false;
 		return repNum;
 	}
 	
-	public static void listRepsTrans(Customer customer, int skipRepNum1, int skipRepNum2, int skipRepNum3){
+	public static void listRepsTrans(Customer customer, int skipRepNum1, int skipRepNum2, int skipRepNum3, boolean inclEmptReps){
 		int repSize = customer.getRep().size();
 		for (int i = 0; i < repSize; i++){
 			int repNumList = customer.getRepNum(i);
 			if(repNumList != skipRepNum1 && repNumList != skipRepNum2 && repNumList != skipRepNum3){
+				if(inclEmptReps == true || (inclEmptReps == false && customer.getRepBal(repNumList) != 0)){
 				System.out.printf("(%d) Transfer your balance to Account # %d %s : %.2f souls\n", i+1,repNumList, customer.getRepType(repNumList), customer.getRepBal(repNumList));
+				}
 			}
 		}
 	}
 	
-	public static void listReps(Customer customer, int skipRepNum1, int skipRepNum2, int skipRepNum3){
+	public static int listReps(Customer customer, int skipRepNum1, int skipRepNum2, int skipRepNum3, boolean inclEmptReps){
+		int countReps = 0;
 		int repSize = customer.getRep().size();
+		
 		for (int i = 0; i < repSize; i++){
 			int repNumList = customer.getRepNum(i);
 			if(repNumList != skipRepNum1 && repNumList != skipRepNum2 && repNumList != skipRepNum3){
-				System.out.printf("(%d) Account #: %d  Soul %s : %.2f \n", i+1, repNumList, customer.getRepType(repNumList), customer.getRepBal(repNumList));
+				if(inclEmptReps == true || (inclEmptReps == false && customer.getRepBal(repNumList) != 0)){
+					System.out.printf("(%d) Account #: %d  Soul %s : %.2f \n", i+1, repNumList, customer.getRepType(repNumList), customer.getRepBal(repNumList));
+					countReps++;
+				}
 			}
 		}
+		return countReps;
 	}
-
-	public static Customer deleteCust(Customer customer, boolean finalTrans) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 }

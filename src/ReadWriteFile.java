@@ -156,20 +156,20 @@ public class ReadWriteFile{
 		Scanner sc1 = null;
 		Scanner sc2 = null;
 		String userNameFile;
-		
+
 		try {
 			sc1 = new Scanner(new File("Customers.txt"));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		while(sc1.hasNext()){
 			userNameFile = sc1.next();
 			String password = sc1.next();
 			String firstName = sc1.next();
 			String lastName = sc1.next();
-			
+
 			if(userName.equals(userNameFile)){
 				customer.setUserName(userNameFile);
 				customer.setPassword(password);
@@ -177,38 +177,32 @@ public class ReadWriteFile{
 				customer.setLastName(lastName);
 			}
 		}
-		
+
 		sc1.close();
-		
+
 		try {
 			sc2 = new Scanner(new File("Repositories.txt"));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		while(sc2.hasNext()){
 			userNameFile = sc2.next(); 
 			int repNum = Integer.parseInt(sc2.next());
 			String repType = sc2.next();
 			double repBal = Double.parseDouble(sc2.next());
-			
+
 			if(userNameFile.equals(userName)){
 				Repositories temp = new Repositories(repType, repNum, repBal);
 				customer.addRep(temp);
 			}
-			
-			/*for(int i=0; i<customer.size(); i++){
-			//	if(customer.get(i).getUserName().equals(userName)){
-			//		customer.get(i).addAccount(temp);
-			//	}
-			}*/
 		}
-	
+		
 		sc2.close();
 		return customer;
 	}
-
+	
 	public static int findUnusedRepNum(){
 		ArrayList<Repositories> Reps = loadReps();
 		int repSize = Reps.size();
@@ -231,11 +225,12 @@ public class ReadWriteFile{
 	}
 
 	public static Customer transferSouls(Customer customer, int repAddBal, int repSubtrBal, double transAmt, boolean addToRep, boolean subtrFromRep){
+		String fileName = "Repositories.txt";
 		ArrayList<String> reps = new ArrayList<String>(); 
 		Scanner sc2 = null;
 		
 		try {
-			sc2 = new Scanner(new File("Repositories.txt"));
+			sc2 = new Scanner(new File(fileName));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -272,14 +267,7 @@ public class ReadWriteFile{
 		sc2.close();
 		
 		//replaces file with the newly editted values
-		for (int i = 0; i < reps.size(); i++){
-			if(i == 0){
-				ReadWriteFile.replaceFile("Repositories.txt", reps.get(i));
-			}
-			else{
-				ReadWriteFile.appendToFile("Repositories.txt", reps.get(i));
-			}
-		}
+		rewriteFile(fileName, reps);
 		
 		customer = loadCustomerFull(customer.getUserName());
 		
@@ -316,7 +304,69 @@ public class ReadWriteFile{
 					}
 				}
 			}
+		}
+	}
+
+	public static void donateToDarkOnes(Customer customer, double transVal){
+		String fileName = "DarkOnes.txt";
+		ArrayList<String> darkDons = new ArrayList<String>();
+		boolean isThere = false;
+		Scanner sc2 = null;
+		double darkOneBal = 0;
+		
+		try {
+			sc2 = new Scanner(new File(fileName));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		//reads all account data into the program, while adding or subtracting to balances depending on the transaction
+		while(sc2.hasNext()){
+			String userName = sc2.next(); 
+			darkOneBal = Double.parseDouble(sc2.next());
+
+			if (customer.getUserName().equals(userName)){
+				darkOneBal = darkOneBal + transVal;
+				isThere = true;
+			}
+
+			StringBuilder temp = new StringBuilder(); 
+
+			temp.append(userName).append(" ");
+			temp.append(darkOneBal);
+
+			String temp2 = temp.toString();
 			
+			darkDons.add(temp2);
+		}
+		
+		if(isThere == false){
+			darkOneBal = transVal;
+			StringBuilder temp = new StringBuilder(); 
+			
+			temp.append(customer.getUserName()).append(" ");
+			temp.append(darkOneBal);
+			
+			String temp2 = temp.toString();
+			
+			darkDons.add(temp2);
+		}
+		
+		sc2.close();
+		
+		//replaces file with the newly editted values
+		rewriteFile(fileName, darkDons);
+	}
+
+	private static void rewriteFile(String fileName, ArrayList<String> newData) {
+		for (int i = 0; i < newData.size(); i++){
+			if(i == 0){
+				ReadWriteFile.replaceFile(fileName, newData.get(i));
+			}
+			else{
+				ReadWriteFile.appendToFile(fileName, newData.get(i));
+			}
 		}
 	}
 }
