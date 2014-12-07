@@ -1,113 +1,135 @@
 import java.util.ArrayList;
 
-public class LoginMethods {
+import customerInfo.Customer;
+
+public class LoginMethods extends Main{
+	/**
+	 * This method prompts 
+	 */
 	public static void newCust(){
-		Boolean test = false;
-		ArrayList<customerInfo.Customer> customers = ReadWriteFile.loadCustomers();
-		String inUserName = null;
-		String inPassword = null;
-		String inFirstName = null;
-		String inLastName = null;
-		UserInputMethods.scanClear();
-
-		while (test == false){
-			System.out.print("New username (letters and numbers only, between 5-10 characters): ");
-			inUserName = UserInputMethods.scanStr(null);
-
-			test = CheckMethods.LNCheck(inUserName,5,10);
-
-			if (test == false){
-				System.out.println("Invalid username.");
-			}
-
-			for(int i = 0; i<customers.size(); i++){
-				if (inUserName.equals(customers.get(i).getUserName())){
-					test = false;
-					System.out.println("This username is already in use, please choose another.");
-				}
-			}
-		}
-
-		test = false;
-
-		while (test == false){
-			System.out.print("New Password (may only contain letters and numbers, between 5-10 characters): ");
-			inPassword = UserInputMethods.scanStr(null);
-
-			test = CheckMethods.LNCheck(inPassword,5,10); 
-			if (test == true){
-				System.out.println("Your password is valid.");
-			}
-			else{
-				System.out.println("Your password is not valid, try again.");
-			}
-		}
-
-		test = false;
-
-		while (test == false){
-			System.out.print("Input your First Name (only letters, max length of 50): ");
-			inFirstName = UserInputMethods.scanStr(null);
-
-			test = CheckMethods.LNCheck(inFirstName,1,50);
-
-			if(test == false){
-				System.out.println("Please only use letters.");
-			}
-		}
-
-		test = false;
-
-		while (test == false){
-			test = true;
-			System.out.print("Input your Last Name (no spaces, max length of 50): ");
-			inLastName = UserInputMethods.scanStr(null);
-
-			test = CheckMethods.LNCheck(inLastName, 1, 50);
-
-			if(test == false){
-				System.out.print("Please only use letters.");
-			}
-		}
 		
-		String filename= "Customers.txt";
-		String FileData = inUserName + " " + inPassword + " " + inFirstName + " " + inLastName;
-		
-		ReadWriteFile.appendToFile(filename, FileData);
-		ReadWriteFile.recordAction(inUserName, "NewAccount", "");
+		System.out.println("To create a new account, we need a username, password and your name.");
+		System.out.println("Enter 'back' to go back to the login screen.");
 
-		System.out.println("Thank you for your soul, please press enter to login with your new account");
+		String inUserName = newUserName(5, 10);
+		String inPassword = newPassword(5, 10);
+		String inFirstName = inputName("your first name", 50);
+		String inLastName = inputName("your last name", 50);
+		
+		if(exit == false){
+			ReadWriteFile.newCust(inUserName, inUserName, inPassword, inFirstName, inLastName);
+			System.out.println("Congratulations on opening a new Account");
+		}
 	}
 	
-	public static String Login(){
-		
-		boolean passwordCorrect = false;
+	public static String Login(){	
 		ArrayList<customerInfo.Customer> customers = ReadWriteFile.loadCustomers();
-		UserInputMethods.scanClear();
-		String inUserName = null;
-		String inPassword;
 		
-		while (passwordCorrect == false){
+		while (exit == false){
+			String inPassword = null;
+			System.out.println("Enter 'back' to go back to the login screen");
 			System.out.print("Username: ");
-			inUserName = UserInputMethods.scanStr(inUserName);
-
-			System.out.print("Password: ");
-			inPassword = UserInputMethods.scanStr(inUserName);
 			
-			for(int i = 0; i<customers.size(); i++){
-				if (inUserName.equals(customers.get(i).getUserName())){
-					if (inPassword.equals(customers.get(i).getPassword())){
-						passwordCorrect = true;
-						ReadWriteFile.recordAction(inUserName, "Login", "");
-						System.out.println("Welcome to super awesome fun time.");
+			
+			String inUserName = UserInputMethods.scanStr("null");
+			exitCompare(inUserName, "back");
+			
+			
+			
+			if(exit == false){
+				//System.out.print("Password: ");
+				inPassword = UserInputMethods.scanPwd(inUserName, "Password: ");
+				exitCompare(inUserName, "back");
+			}
+			
+			if(exit == false){
+				for(int i = 0; i<customers.size(); i++){
+					if (inUserName.equals(customers.get(i).getUserName())){
+						if (inPassword.equals(customers.get(i).getPassword())){
+							ReadWriteFile.recordActiv(inUserName, "Login");
+							return inUserName;
+							//System.out.println("Welcome to super awesome fun time.");
+						}
+						else if(i == customers.size()){
+							System.out.println("Username and/or password do not match or exist, try again.");
+							ReadWriteFile.recordActiv(inUserName, "FailedLogin");
+						}
 					}
 				}
 			}
-			if(passwordCorrect == false){
-				System.out.println("Username and/or password do not match or exist, try again.");
-				ReadWriteFile.recordAction(inUserName, "FailedLogin", "");
+		}
+		return null;
+	}
+	
+	private static void exitCompare(String value, String check){
+		if(value.equals(check)){
+			exit = true;
+		}
+		else exit = false;
+	}
+
+	public static String newUserName(int minLen, int maxLen){
+		ArrayList<Customer> customers = ReadWriteFile.loadCustomers();
+		boolean valid = false; 
+		
+		while (valid == false && exit == false){
+			System.out.print("New username (" + minLen + "-" + maxLen + " characters, may only contain letters and numbers): ");
+			String inUserName = UserInputMethods.scanStr(null);
+
+			valid = UserInputMethods.checkLetNum(inUserName,minLen,maxLen);
+			exitCompare(inUserName, "back");
+
+			if (valid == false && exit == false){
+				System.out.println("Invalid username.");
+			}
+			else if(valid == true && exit == false){
+				for(int i = 0; i<customers.size(); i++){
+					if (inUserName.equals(customers.get(i).getUserName())){
+						valid = false;
+						System.out.println("This username is already in use, please choose another.");
+					}
+					else if(i == customers.size()) return inUserName;
+				} 
 			}
 		}
-		return inUserName;
+		return null;
+	}
+
+	public static String newPassword(int minLen, int maxLen){
+		boolean valid = false;
+
+		while (valid == false  && exit == false){
+			System.out.print("New Password (" + minLen + "-" + maxLen + " characters, may only contain letters and numbers): ");
+			String inPassword = UserInputMethods.scanStr(null);
+			
+			valid = UserInputMethods.checkLetNum(inPassword,minLen,maxLen);
+			exitCompare(inPassword, "back");
+
+			if (valid == true && exit == false){
+				System.out.println("Your password is valid.");
+				return inPassword;
+			}
+			else if(exit == false)
+				System.out.println("Your password is not valid, try again.");
+		}
+		return null;
+	}
+	
+
+	public static String inputName(String label, int maxLen){
+		boolean valid = false;
+		
+		while (valid == false && exit == false){
+			System.out.println("Input " + label + " (only letters, max length of " + maxLen + "): ");
+			String inName = UserInputMethods.scanStr(null);
+
+			valid = UserInputMethods.checkLetNum(inName,1,maxLen);
+			exitCompare(inName, "back");
+
+			if(valid == false && exit == false){
+				System.out.println("Please only use letters.");
+			}
+		}
+		return null;
 	}
 }

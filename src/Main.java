@@ -4,11 +4,9 @@ public class Main {
 	static boolean exit = false;
 	
 	public static void main(String args[]) {
-		String userName = "JoeBob";
-		
 		while(true){
-			//String userName = null;
-			//userName = front();  removed for testing purposes
+			String userName = null;
+			userName = front();
 			mainMenu(userName);
 			System.out.println("Have a frightful day.");
 		}
@@ -16,12 +14,11 @@ public class Main {
 	
     public static String front(){
     	String userName = null;
-    	boolean option = false;
 
     	System.out.println("Welcome to Mike's soul repository.");
     	System.out.println("The only place you can you literally share your soul.");
     	
-    	while (option == false){
+    	while (true){
     		System.out.println("New Account (1) or Login (2), type (escape) at any time to quit this program: ");
     		int choice = UserInputMethods.scanInt(userName);
     		switch (choice) {
@@ -29,12 +26,13 @@ public class Main {
     			LoginMethods.newCust();
     		case 2:
     			userName = LoginMethods.Login();
-    			return userName;
+    			if(exit == false) return userName;
+    			break;
     		default:
     			invSelect();
     		}
+    		exit = false;
     	}
-    	return userName;
     }
 
     public static void mainMenu(String userName){
@@ -61,33 +59,32 @@ public class Main {
     		case 1: 
     			customer = MainMethods.newRepMenu(customer, true);
     			backMain();
-    			exit = false;
     			break;
     		case 2:
     			MainMethods.checkBalMenu(customer, true);
     			backMain();
-    			exit = false;
     			break;
     		case 3:
     			customer = MainMethods.transExtDepMenu(customer, true);
     			backMain();
-    			exit = false;
     			break;
     		case 4:
-    			customer = MainMethods.closeRepMenu(customer, true);
+    			customer = MainMethods.closeAcctsMenu(customer, true);
     			backMain();
-    			exit = false;
     			break;
     		case 5:
-    			customer = MainMethods.devilDealMenu(customer, true);
+    			customer = MainMethods.devilDealMenu(customer, true, null);
     			backMain();
-    			exit = false;
     			break;
     		case 6:
     			exit = true;
+    			break;
     		default:
     			invSelect();
     		}
+    		if(customer.getUserName() == null){
+        		exit = true;
+        	}
     	}
     	exit = false;
     }

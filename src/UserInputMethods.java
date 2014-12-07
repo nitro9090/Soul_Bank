@@ -1,4 +1,6 @@
 import java.util.Scanner;
+import java.util.regex.Pattern;
+import java.io.Console;
 
 public class UserInputMethods {
 	static Scanner sc = new Scanner(System.in);
@@ -7,12 +9,11 @@ public class UserInputMethods {
 		String scanVal = sc.nextLine();
 		ExitMethods.exitNormal(scanVal, userName);
 		clearConsole();
-		String Output = scanVal;
-		return Output;
+		return scanVal;
 	}
 
 	public static int scanInt(String userName){
-		int Output = 0;
+		int Output = -1;
 		String scanVal = sc.nextLine();
 		ExitMethods.exitNormal(scanVal, userName);
 		clearConsole();
@@ -23,20 +24,18 @@ public class UserInputMethods {
 		return Output;
 	}
 	
-	public static Double scanDbl(String userName){
-		Double Output = -1.0;
+	public static Double scanDbl(String userName, int numDec){
 		String scanVal = sc.nextLine();
 		ExitMethods.exitNormal(scanVal, userName);
+		boolean check = decCheck(scanVal, numDec);
 		clearConsole();
-		try{
-			Output = Double.parseDouble(scanVal);
-		}catch(Exception e){
+		if(check == true){
+			try{
+				return Double.parseDouble(scanVal);
+			}catch(Exception e){
+			}
 		}
-		return Output;
-	}
-	
-	public static void scanClear(){
-		sc.nextLine();
+		return -1.0;
 	}
 	
 	public final static void clearConsole()  // unclear if this works, but it is supposed to clear the console each time it is run.
@@ -59,4 +58,51 @@ public class UserInputMethods {
 	        //  Handle any exceptions.
 	    }
 	}
+	
+	public static boolean checkLetNum(String value, int minLength, int maxLength){
+		boolean test = false;
+		
+		if (Pattern.matches("[a-zA-Z0-9]+",value) == true && value.length() >= minLength && value.length() <= maxLength){
+			test = true;
+		}
+
+		return test;
+	}
+	
+	public static boolean decCheck(String input, int numDec){
+	    if(input.contains("\\.")){
+	    	String[] splitDouble = input.split("\\.");
+	    	if (splitDouble[1].length() <= numDec){
+				return true;
+			}
+	    	else return false;
+	    }
+	    return true;
+	}
+	
+	public static String scanPwd(String userName, String dialogue) {
+		System.out.print("Password: ");
+		String pwdStr = scanStr(userName);
+		
+		/*String pwdStr = "boogie";
+		
+		try{
+			// creates a console object
+			Console cnsl = System.console();
+
+			// if console is not null
+			if (cnsl != null) {
+				// read password into the char array
+				char[] pwdChar = cnsl.readPassword(dialogue);
+				pwdStr = new String(pwdChar);
+			}      
+		}catch(Exception ex){
+
+			// if any error occurs
+			ex.printStackTrace();      
+		}
+		ExitMethods.exitNormal(pwdStr, userName);
+		clearConsole();*/
+		return pwdStr;
+    }
 }
