@@ -1,6 +1,6 @@
+package Misc;
 import java.util.Scanner;
 import java.util.regex.Pattern;
-import java.io.Console;
 
 public class UserInputMethods {
 	static Scanner sc = new Scanner(System.in);

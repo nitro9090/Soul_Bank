@@ -1,3 +1,5 @@
+package Misc;
+
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -5,10 +7,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
-import customerInfo.Customer;
-import customerInfo.PersVals;
-import customerInfo.RepActiv;
-import customerInfo.Repositories;
+import repositories.RepActiv;
+import repositories.Repositories;
+import users.Admin;
+import users.Customer;
+import users.User;
 
 public class ReadWriteFile{
 	public static void appendToFile(String filename, String fileData){
@@ -68,11 +71,12 @@ public class ReadWriteFile{
 		appendToFile(fileName, record);
 	}
 	
-	public static Customer transferSouls(Customer customer, int repAddBal, int repSubtrBal, double transAmt, boolean addToRep, boolean subtrFromRep){
+	/*public static void transferSouls(boolean addToRep, boolean subtrFromRep, int repNumAdd, int repNumSubtr, double transAmt){
 		String fileName = "Repositories.txt";
 		ArrayList<String> reps = new ArrayList<String>(); 
 		Scanner sc2 = null;
 		
+		// start file scanner
 		try {
 			sc2 = new Scanner(new File(fileName));
 		} catch (FileNotFoundException e) {
@@ -87,13 +91,11 @@ public class ReadWriteFile{
 			String repType = sc2.next();
 			double repBal = Double.parseDouble(sc2.next());
 	
-			if (customer.getUserName().equals(userName)){
-				if(repAddBal == repNum && addToRep == true){
-					repBal = repBal + transAmt;
-				}
-				else if ( repSubtrBal == repNum && subtrFromRep == true){
-					repBal = repBal - transAmt;
-				}
+			if(repNumAdd == repNum && addToRep == true){
+				repBal = repBal + transAmt;
+			}
+			else if (repNumSubtr == repNum && subtrFromRep == true){
+				repBal = repBal - transAmt;
 			}
 	
 			StringBuilder temp = new StringBuilder(); 
@@ -112,18 +114,175 @@ public class ReadWriteFile{
 		
 		//replaces file with the newly editted values
 		rewriteFile(fileName, reps);
+	}*/
+	
+	public static void addSubtrSouls(int transRepNum, double transAmt){
+		String fileName = "Repositories.txt";
+		ArrayList<String> reps = new ArrayList<String>(); 
+		Scanner sc2 = null;
 		
-		customer = loadCustomerFull(customer.getUserName());
+		// start file scanner
+		try {
+			sc2 = new Scanner(new File(fileName));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		//reads all account data into the program, while adding or subtracting to balances depending on the transaction
+		while(sc2.hasNext()){
+			String userName = sc2.next(); 
+			int repNum = sc2.nextInt();
+			String repType = sc2.next();
+			double repBal = Double.parseDouble(sc2.next());
+	
+			if(transRepNum == repNum){
+				repBal = repBal + transAmt;
+			}
+	
+			StringBuilder temp = new StringBuilder(); 
+			
+			temp.append(userName).append(" ");
+			temp.append(repNum).append(" ");
+			temp.append(repType).append(" ");
+			temp.append(repBal);
+			
+			String temp2 = temp.toString();
+			
+			reps.add(temp2);
+		}
 		
-		return customer;
+		sc2.close();
+		
+		//replaces file with the newly editted values
+		rewriteFile(fileName, reps);
+	}
+	
+	public static ArrayList<User> loadUsers() {
+		ArrayList<User> users = new ArrayList<>();
+		Scanner sc1 = null;
+		
+		try {
+			sc1 = new Scanner(new File("Users.txt"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		while(sc1.hasNext()){
+			String userName = sc1.next();
+			String password = sc1.next();
+			String userType = sc1.next();
+			String firstName = sc1.next();
+			String lastName = sc1.next();
+			
+			User temp = new User(userName, password, userType, firstName, lastName);
+			
+			users.add(temp);
+		}
+		
+		sc1.close();
+		return users;
 	}
 
-	public static ArrayList<Repositories> loadReps() {
+	
+	public static User loadUser(String userName){
+		ArrayList<User> users = loadUsers();
+		
+		for(int i = 0; i < users.size(); i++){
+			if(users.get(i).getUserName().equals(userName)){
+				return users.get(i);
+			}
+		}
+		return new User();
+	}
+	
+	public static ArrayList<Admin> loadAdmins() {
+		ArrayList<User> users = loadUsers();
+		ArrayList<Admin> admins = new ArrayList<>();
+		
+		for(int i = 0; i<users.size(); i++){
+			if(users.get(i).getAcctType().equals("Admin")){
+				Admin temp = new Admin(users.get(i));
+				admins.add(temp);
+			}
+		}
+		return admins;
+	}
+
+	
+	public static User loadAdmin(String userName){
+		ArrayList<User> users = loadUsers();
+		
+		for(int i = 0; i < users.size(); i++){
+			if(users.get(i).getUserName().equals(userName)){
+				return users.get(i);
+			}
+		}
+		return new User();
+	}
+	
+	public static ArrayList<Customer> loadCustomers(){
+		ArrayList<User> users = loadUsers();
+		ArrayList<Customer> customers = new ArrayList<>();
+		
+		for(int i = 0; i < users.size(); i++){
+			if(users.get(i).getAcctType().equals("Cust")){
+				Customer temp = new Customer(users.get(i));
+				customers.add(temp);
+			}	
+		}
+		return customers;
+	}
+
+	public static Customer loadCustomer(String userName) {
+		ArrayList<Customer> customers = loadCustomers();
+		
+		for(int i = 0; i<customers.size(); i++){
+			if(userName.equals(customers.get(i).getUserName())){
+				return customers.get(i);
+			}
+		}
+		return new Customer();
+	}
+	
+	public static ArrayList<Repositories> loadRep(String loadUserName) {
+		String fileName = "Repositories.txt";
 		ArrayList<Repositories> repositories = new ArrayList<>();
 		Scanner sc1 = null;
 		
 		try {
-			sc1 = new Scanner(new File("Repositories.txt"));
+			sc1 = new Scanner(new File(fileName));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		while(sc1.hasNext()){
+			String inUserName = sc1.next();  //skips over usernames in the file
+			String repNum = sc1.next();
+			String repType = sc1.next();
+			String balance = sc1.next();
+			int repNumInt = Integer.parseInt(repNum);
+			double repBalDbl = Double.parseDouble(balance);
+			
+			if(inUserName.equals(loadUserName)){
+				Repositories temp = new Repositories(repNumInt, repType, repBalDbl);
+				repositories.add(temp);
+			}
+		}
+		
+		sc1.close();
+		return repositories;
+	}
+
+	public static ArrayList<Repositories> loadReps() {
+		String fileName = "Repositories.txt";
+		ArrayList<Repositories> repositories = new ArrayList<>();
+		Scanner sc1 = null;
+		
+		try {
+			sc1 = new Scanner(new File(fileName));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -137,7 +296,7 @@ public class ReadWriteFile{
 			int repNumInt = Integer.parseInt(repNum);
 			double repBalDbl = Double.parseDouble(balance);
 			
-			Repositories temp = new Repositories(repType, repNumInt, repBalDbl);
+			Repositories temp = new Repositories(repNumInt, repType, repBalDbl);
 			
 			repositories.add(temp);
 		}
@@ -146,135 +305,6 @@ public class ReadWriteFile{
 		return repositories;
 	}
 
-	public static ArrayList<Customer> loadCustomersFull() {
-		ArrayList<Customer> customer = new ArrayList<>();
-		Scanner sc1 = null;
-		
-		try {
-			sc1 = new Scanner(new File("Customers.txt"));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		while(sc1.hasNext()){
-			String userName = sc1.next();
-			String password = sc1.next();
-			String firstName = sc1.next();
-			String lastName = sc1.next();
-			
-			Customer temp = new Customer(userName, password, firstName, lastName);
-			
-			customer.add(temp);
-		}
-		
-		sc1.close();
-		
-		Scanner sc2 = null;
-		try {
-			sc2 = new Scanner(new File("Repositories.txt"));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		int custSize = customer.size();
-		
-		while(sc2.hasNext()){
-			String userNameFile = sc2.next(); 
-			int repNum = Integer.parseInt(sc2.next());
-			String repType = sc2.next();
-			double repBal = Double.parseDouble(sc2.next());
-			for(int i = 0; i < custSize; i++){
-				if(userNameFile.equals(customer.get(i).getUserName())){
-					Repositories temp = new Repositories(repType, repNum, repBal);
-					customer.get(i).addRep(temp);
-				}
-			}
-		}
-		
-		sc2.close();
-		return customer;
-	}
-
-	public static ArrayList<Customer> loadCustomers() {
-		ArrayList<Customer> customer = new ArrayList<>();
-		Scanner sc1 = null;
-		
-		try {
-			sc1 = new Scanner(new File("Customers.txt"));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		while(sc1.hasNext()){
-			String userName = sc1.next();
-			String password = sc1.next();
-			String firstName = sc1.next();
-			String lastName = sc1.next();
-			
-			Customer temp = new Customer(userName, password, firstName, lastName);
-			
-			customer.add(temp);
-		}
-		
-		sc1.close();
-		return customer;
-	}
-
-	public static Customer loadCustomerFull(String userName) {
-		Customer customer = new Customer();
-		Scanner sc1 = null;
-		Scanner sc2 = null;
-		String userNameFile;
-
-		try {
-			sc1 = new Scanner(new File("Customers.txt"));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		while(sc1.hasNext()){
-			userNameFile = sc1.next();
-			String password = sc1.next();
-			String firstName = sc1.next();
-			String lastName = sc1.next();
-
-			if(userName.equals(userNameFile)){
-				customer.setUserName(userNameFile);
-				customer.setPassword(password);
-				customer.setFirstName(firstName);
-				customer.setLastName(lastName);
-			}
-		}
-
-		sc1.close();
-
-		try {
-			sc2 = new Scanner(new File("Repositories.txt"));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		while(sc2.hasNext()){
-			userNameFile = sc2.next(); 
-			int repNum = Integer.parseInt(sc2.next());
-			String repType = sc2.next();
-			double repBal = Double.parseDouble(sc2.next());
-
-			if(userNameFile.equals(userName)){
-				Repositories temp = new Repositories(repType, repNum, repBal);
-				customer.addRep(temp);
-			}
-		}
-		
-		sc2.close();
-		return customer;
-	}
-	
 	public static ArrayList<PersVals> loadPersVals(){
 		ArrayList<PersVals> persVals = new ArrayList<>();
 		Scanner sc1 = null;
@@ -372,7 +402,7 @@ public class ReadWriteFile{
 	}
 
 	public static void deleteRep(int repNum){
-		ArrayList<Customer> customers = loadCustomersFull();
+		ArrayList<Customer> customers = loadCustomers(); 
 		boolean firstWrite = true;
 		String fileName = "Repositories.txt";
 		int custSize = customers.size();
@@ -484,11 +514,10 @@ public class ReadWriteFile{
 		rewriteFile(fileName, darkDons);
 	}
 	
-	public static void newCust(String customer, String userName, String pwd, String firstName, String lastName){
-		String filename= "Customers.txt";
-		String FileData = userName + " " + pwd + " " + firstName + " " + lastName;
+	public static void newUser(String customer, String userName, String pwd, String acctType, String firstName, String lastName){
+		String filename= "Users.txt";
+		String FileData = userName + " " + pwd + " " + acctType + " " + firstName + " " + lastName;
 		
 		appendToFile(filename, FileData);
-		recordActiv(customer, "NewCust");
 	}
 }

@@ -1,4 +1,5 @@
-package customerInfo;
+package transactions;
+
 
 public class Donations {
 	private int repNum = 0;

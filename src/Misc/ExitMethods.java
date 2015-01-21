@@ -1,3 +1,6 @@
+package Misc;
+
+
 
 public class ExitMethods {
 	/**
@@ -29,5 +32,12 @@ public class ExitMethods {
 		System.out.println("You have been bad, now begone.");
 		ReadWriteFile.recordActiv("null", "BadLogin");
 		System.exit(0);
+	}
+	
+	public static boolean exitCompare(String value, String check){
+		if(value.equals(check)){
+			return true;
+		}
+		return false;
 	}
 }

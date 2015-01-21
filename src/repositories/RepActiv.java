@@ -1,4 +1,5 @@
-package customerInfo;
+package repositories;
+
 
 public class RepActiv {
 	int activNum;

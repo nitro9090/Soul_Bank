@@ -1,4 +1,4 @@
-package customerInfo;
+package Misc;
 
 public class PersVals {
 	String valLabel = null;
