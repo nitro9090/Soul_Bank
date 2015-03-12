@@ -13,20 +13,22 @@ import Misc.ReadWriteFile;
 import Misc.UserInputMethods;
 
 public class User {
-	public static boolean exit = false;
+	protected static boolean mainExit = false;
 	private boolean authenticated = false;
 	protected String userName;
 	private String password;
 	private String acctType;
 	private String firstName;
 	private String lastName;
+	protected Transactions currTrans = new Transactions();  // the primary transaction
+	protected Transactions secTrans = new Transactions(); // a secondary transaction, one that takes place due to the primary transaction.
 	
 	public User(){
 		userName = "null";
-		password = null;
-		acctType = null;
-		firstName = null;
-		lastName = null;
+		password = "null";
+		acctType = "null";
+		firstName = "null";
+		lastName = "null";
 	}
 	
 	public User(String uN, String pW, String uT, String fN, String lN){
@@ -70,8 +72,12 @@ public class User {
 		return authenticated;
 	}
 	
+	public Transactions getSecTrans(){
+		return secTrans;
+	}
+	
 	public boolean getExit(){
-		return exit;
+		return mainExit;
 	}
 	
 	public void setUser(String uN){
@@ -107,11 +113,21 @@ public class User {
 		acctType = uT;
 	}
 	
+	public void setSecTrans(Transactions T){
+		secTrans = T;
+	}
+	
 	public void setExit(boolean inExit){
-		exit = inExit;
+		mainExit = inExit;
+	}
+	
+	public void refreshRepList(){
+		//if the user is a customer then this will refresh their repository list, otherwise it does nothing.
 	}
 
-
+	public void mainMenu() {
+		System.out.println("The main menu for this account type has not been setup.");
+	}
 
 	/*public String Login(){	
 		ArrayList<Customer> customers = ReadWriteFile.loadCustomers();
@@ -152,36 +168,32 @@ public class User {
 		return null;
 	}*/
 
-	
-	
 	public void authentUser(){
-		ArrayList<Customer> customers = ReadWriteFile.loadCustomers();
 		String inPassword = null;
 		
 		System.out.println("Enter 'back' to go back to the login screen");
 		System.out.print("Username: ");
 
 		String inUserName = UserInputMethods.scanStr(null);
-		exit = ExitMethods.exitCompare(inUserName, "back");
+		mainExit = ExitMethods.exitCompare(inUserName, "back");
 
-		if(exit == false){
-			//System.out.print("Password: ");
+		if(mainExit == false){
 			inPassword = UserInputMethods.scanPwd(inUserName, "Password: ");
-			exit = ExitMethods.exitCompare(inUserName, "back");
+			mainExit = ExitMethods.exitCompare(inPassword, "back");
 		}
 
-		if(exit == false){
-			for(int i = 0; i<customers.size(); i++){
-				if (inUserName.equals(customers.get(i).getUserName())){
-					if (inPassword.equals(customers.get(i).getPassword())){
+		if(mainExit == false){
+			ArrayList<User> users = ReadWriteFile.loadUsers();
+			for(int i = 0; i<users.size(); i++){
+				if (inUserName.equals(users.get(i).getUserName())){
+					if (inPassword.equals(users.get(i).getPassword())){
 						setUser(inUserName);
 						ReadWriteFile.recordActiv(inUserName, "Login");
 						authenticated = true;
 						break;
 					}
-					
 				}
-				else if(i == customers.size()-1){
+				else if(i == users.size()-1){
 					System.out.println("Username and/or password do not match or exist, try again.");
 					authenticated = false;
 					ReadWriteFile.recordActiv(userName, "FailedLogin:" + inUserName);
@@ -190,6 +202,25 @@ public class User {
 		}
 	}
 
+	protected static void backMain() {
+		System.out.println("Welcome back to the main menu, your options are:");
+	}
+	
+	public static void returnToMainDial(){
+		System.out.println("You are being returned to the main menu.");
+	}
+	
+	public String newRepMenu(){	
+		System.out.println("Creating new Repositories has not been setup for this account type.");
+		currTrans.setTransExit(true);
+		return "null";
+	}
+
+	public void checkBalMenu() {
+		System.out.println("Checking balances has not been setup for this account type.");
+		mainExit = true;
+	}
+	
 	protected void depSouls(int repNum,  double transVal){
 		String action = "Deposit";
 		
@@ -207,7 +238,7 @@ public class User {
 	}
 
 	public void newRep(String repUserName, String repType, double inRepBal){
-		if (exit == false){
+		if (mainExit == false){
 			String action = "NewRep";
 			String filename = "Repositories.txt";
 			
@@ -239,7 +270,7 @@ public class User {
 		if(userName.equals(delCustomer.getUserName()) ){
 			authenticated = false;
 			userName = null;
-			exit = true;
+			mainExit = true;
 		}
 	}
 
@@ -261,28 +292,8 @@ public class User {
 		//System.out.println(transVal + " souls have been donated from " + donUserName + "'s " + repNum + " " + customer.getRepType(repNum) +  " account.");
 	}
 
-	protected static void backMain() {
-		System.out.println("Welcome back to the main menu, your options are:");
-	}
-
-	public String inputYN(){
-		if(exit == false){
-			String isYN = UserInputMethods.scanStr(userName);
-	
-			if(isYN.equals("Y")){	
-				return isYN;
-			}
-			else if(isYN.equals("N")){
-				//System.out.println("The transaction has been cancelled.  You will be returned to the main menu.");
-				return isYN;
-			}
-			else MiscMeth.invSelect();
-		}
-		return "null";
-	}
-
 	void actionDoubleCheck(String action, boolean finalTrans, double transVal, Customer customer, int repNumTo, int repNumFrom, String repType){
-		while (exit == false){
+		while (mainExit == false){
 			Transactions currTrans = new Transactions(userName, customer, null);
 			
 			if(action.equals("Transfer")){
@@ -321,7 +332,7 @@ public class User {
 			}
 			else{
 				System.out.println("Error: action double check wasn't accessed properly");
-				exit = true;
+				mainExit = true;
 				break breakWhile;
 			}
 			
@@ -356,7 +367,7 @@ public class User {
 				break;
 			}
 			else if(isYN.equals("N")){
-				exit = true;
+				mainExit = true;
 			}	
 		}
 	}
@@ -376,7 +387,7 @@ public class User {
 		}
 		
 		breakWhile:
-		while (exit == false){
+		while (mainExit == false){
 			if(action.equals("Money") || action.equals("Power") || action.equals("Love")){
 				for(int i = 0; i < donations.size(); i++){
 					System.out.println("You are donating " + donations.get(i).getDonAmt() + " souls from account # " + donations.get(i).getRepNum() + " " + customer.getRepType(donations.get(i).getRepNum()));
@@ -387,7 +398,7 @@ public class User {
 			}
 			else{
 				System.out.println("Error: deal double check wasn't accessed properly");
-				exit = true;
+				mainExit = true;
 				break breakWhile;
 			}
 			
@@ -408,10 +419,10 @@ public class User {
 			}
 			else if(isYN.equals("N")){
 				System.out.println("Your donation has been cancelled.");
-				exit = true;
+				mainExit = true;
 			}	
 		}
-		if(finalTrans == true) exit = false;
+		if(finalTrans == true) mainExit = false;
 		return customer;
 	}
 
@@ -419,11 +430,11 @@ public class User {
 		ArrayList<Donations> donations = new ArrayList<>();
 		boolean moreToAdd = true;
 		
-		while(moreToAdd == true && exit == false){
+		while(moreToAdd == true && mainExit == false){
 			int repNumDonate = chooseRepPrompt(customer, false, false, "Which repository would you like to donate from?  You may take from more than one.");
 			double newDonAmt = amtToTransPrompt(customer, "Donate", -1, null, repNumDonate, customer);
 			
-			if(exit == false){
+			if(mainExit == false){
 				double origBal = customer.getRepBal(repNumDonate);
 				customer.setRepBal(repNumDonate, origBal - newDonAmt);
 				
@@ -431,7 +442,7 @@ public class User {
 				donations.add(temp);
 			}
 			
-			while (exit == false){
+			while (mainExit == false){
 				System.out.println("Would you like to donate more?");
 				String isYN = inputYN(customer);
 				if (isYN.equals("Y")){
@@ -443,7 +454,7 @@ public class User {
 				}
 			}
 		}
-		if(finalTrans == true) exit = false;
+		if(finalTrans == true) mainExit = false;
 		return donations;
 	}
 
@@ -473,90 +484,7 @@ public class User {
 		return customer;
 	}
 
-	protected Customer repHasSoul(String userName, int closingRepNum, boolean allowTrans, boolean allowExtr, boolean allowNewRep, boolean allowDon){
-		double transVal = 0;
-		int newRepNum = -1;
-		int repSize = customer.getRep().size();
 	
-		//When attempting to close an account, this method checks to see if the account is empty 
-		//and gives the user options on how to empty the account.
-		if(exit == false){
-			while (customer.getRepBal(closingRepNum) != 0) {
-				boolean check = false;
-				//menu on how to empty the account with souls in it.
-				System.out.println("account # : " +  closingRepNum + " has " + customer.getRepBal(closingRepNum) + " souls in it, you must empty the account in order to close it.");
-				if(allowTrans == true){
-					if (repSize == 1) System.out.println("Note, you are attempting to close your final account.");
-					System.out.println("You may either: ");
-					if (repSize != 1) System.out.println("Transfer all of the souls into the below accounts.");
-					listReps(customer, closingRepNum, 0, 0, true);
-				}
-				if(allowExtr == true){
-					System.out.printf("(%d) Extract all of the souls\n", repSize+1);
-				}
-				if(allowNewRep == true){
-					System.out.printf("(%d) Create a new repository and move all of the souls into it\n", repSize+2);
-				}
-				if(allowDon == true){
-					System.out.printf("(%d) Donate all of the souls to the Dark Ones\n", repSize+3);
-				}
-				System.out.printf("(%d) Return to previous menu\n", repSize+4);
-	
-				int choice = UserInputMethods.scanInt(customer.getUserName());
-	
-				//transfers all of the souls into another account
-				for(int i = 0; i< repSize; i++){
-					if (choice == i+1 && allowTrans){
-						int repNumTo = customer.getRepNum(i); 
-						customer = actionDoubleCheck(customer, "Transfer", false, customer.getRepBal(closingRepNum), repNumTo, customer, closingRepNum, customer, null);
-						check = true;
-					}
-				}
-				//extracts all of the souls from the account
-				if(choice == repSize+1 && allowExtr){
-					customer = actionDoubleCheck(customer, "Extract", false, customer.getRepBal(closingRepNum), -1, null, closingRepNum, customer, null);
-				}
-				//creates a new repository, then transfers all of the souls into that new account.
-				else if(choice == repSize+2 && allowNewRep){
-					Customer customer1 = CustomerMenus.newRepMenu(customer, false);
-	
-					int cust1size = customer1.getRep().size();
-	
-					if(exit == false){
-						for(int j = 0; j < cust1size ; j++){
-							for(int k = 0; k < repSize; k++){
-								if(customer1.getRepNum(j) == customer.getRepNum(k)){
-									break;
-								}
-								else if(k == repSize - 1){
-									newRepNum = customer1.getRepNum(j);
-								}
-							}
-						}
-						customer = customer1;
-						transVal = customer.getRepBal(closingRepNum);
-					}
-					customer = actionDoubleCheck(customer, "Transfer", false, transVal, newRepNum, customer, closingRepNum, customer, null);
-				}
-	
-				// Donate your souls to the dark ones (aka empties the account to nowhere)
-				// needs help
-				else if(choice == repSize+3 && allowDon){
-					ArrayList<Donations> donations = new ArrayList<>();
-					Donations temp = new Donations(closingRepNum, customer.getRepBal(closingRepNum));
-					donations.add(temp);
-					customer = CustomerMenus.devilDealMenu(customer, false, donations);
-				}
-				//Exits the menu
-				else if(choice == repSize+4){
-					exit = true;
-					break;
-				}
-				else if(check == false) MiscMeth.invSelect();
-			}
-		}
-		return customer;
-	}
 
 	protected static void checkRepActiv(int repNum, Customer customer) {
 		String action = "CheckRep";
@@ -566,31 +494,6 @@ public class User {
 		ReadWriteFile.recordRepActiv(activNum, repNum, action, 0);
 	}
 
-	protected static void displayRepActiv(Customer customer, int repNum){
-		ArrayList<RepActiv> repActiv = ReadWriteFile.loadRepActiv(repNum);
-		int repActivSize = repActiv.size();
-		int repStart = repActiv.size() - 10;
-		
-		if(repActivSize < 10){
-			repStart = 0;
-		}
-		
-		System.out.println("The last 10 transactions for account # : " + repNum + " " + customer.getRepType(repNum) + " were");
-		System.out.printf("%-12s %-12s %-12s \n", "Activity #", "Action", "transaction");
-		
-		for(int i = repStart; i<repActiv.size(); i++){
-			System.out.printf("%09d    %-12s %-12.2f \n", repActiv.get(i).getActivNum(), repActiv.get(i).getAction(), repActiv.get(i).getTransVal());
-		}
-		
-		String temp = "CheckBal:" + repNum;
-		ReadWriteFile.recordActiv(customer.getUserName(), temp);
-	}
-
-	public void mainMenu() {
-		// TODO Auto-generated method stub
-		
-	}
-
 	protected void repHasSoul(Customer customer, Repositories rep, boolean allowTrans, boolean allowExtr, boolean allowNewRep, boolean allowDon){
 		double transVal = 0;
 		int newRepNum = -1;
@@ -598,7 +501,7 @@ public class User {
 	
 		//When attempting to close an account, this method checks to see if the account is empty 
 		//and gives the user options on how to empty the account.
-		if(exit == false){
+		if(mainExit == false){
 			while (closingRep.getRepBal() != 0) {
 				boolean check = false;
 				//menu on how to empty the account with souls in it.
@@ -640,7 +543,7 @@ public class User {
 	
 					int cust1size = customer1.getRep().size();
 	
-					if(exit == false){
+					if(mainExit == false){
 						for(int j = 0; j < cust1size ; j++){
 							for(int k = 0; k < repSize; k++){
 								if(customer1.getRepNum(j) == customer.getRepNum(k)){
@@ -667,7 +570,7 @@ public class User {
 				}
 				//Exits the menu
 				else if(choice == repSize+4){
-					exit = true;
+					mainExit = true;
 					break;
 				}
 				else if(check == false) MiscMeth.invSelect();
@@ -678,7 +581,7 @@ public class User {
 
 	private void actionDoubleCheck(String action, boolean finalTrans, double transVal, Repositories repsTo, Repositories repsFrom, String repType){
 		breakWhile:
-		while (exit == false){
+		while (mainExit == false){
 			if(action.equals("Transfer")){
 				System.out.println("After transferring " + transVal + " souls, your account totals will be");
 				System.out.printf("account %d %s : %.2f souls     account %d %s : %.2f souls \n", repsFrom.getRepNum(), repsFrom.getRepType(), repsFrom.getRepBal()-transVal, repsTo.getRepNum(), repsTo.getRepType(), repsTo.getRepBal()+transVal);
@@ -711,7 +614,7 @@ public class User {
 			}
 			else{
 				System.out.println("Error: action double check wasn't accessed properly");
-				exit = true;
+				mainExit = true;
 				break breakWhile;
 			}
 			
@@ -747,8 +650,12 @@ public class User {
 				break breakWhile;
 			}
 			else if(isYN.equals("N")){
-				exit = true;
+				mainExit = true;
 			}	
 		}
+	}
+
+	public void amtToTransDial() {
+		System.out.println("Error: The dialogue for transfer amounts has been setup");
 	}
 }

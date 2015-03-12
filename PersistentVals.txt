@@ -1,2 +1,2 @@
-NewRepNum 13
-ActivityNum 80
+NewRepNum 26
+ActivityNum 228

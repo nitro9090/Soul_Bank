@@ -18,17 +18,15 @@ public class Main {
 			else if(currUser.getAcctType().equals("Cust")){
 				currUser = new Customer(currUser);
 			}
-			if(!currUser.getUserName().equals(null)){
+			if(!currUser.getUserName().equals("null")){
 				currUser.mainMenu();
 				System.out.println("Have a frightful day.");
 			}
-			
 		}
 	}
 	
 	static void front(){
 		String userName = null;
-		NewCustomer newCust = new NewCustomer();
 	
 		System.out.println("Welcome to Mike's soul repository.");
 		System.out.println("The only place you can you literally share your soul.");
@@ -38,12 +36,13 @@ public class Main {
 			int choice = UserInputMethods.scanInt(userName);
 			switch (choice) {
 			case 1: 
-				newCust.createNewCust(null, currUser.getExit());
+				NewCustomer newCust = new NewCustomer();
+				newCust.createNewCust(null);
+				return;
 			case 2:
 				while(!currUser.getAuth() && !currUser.getExit()){
 					currUser.authentUser();
 				}
-				currUser.setExit(false);
 				return;
 			default:
 				MiscMeth.invSelect();

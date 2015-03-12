@@ -1,16 +1,18 @@
 package transactions;
 import java.util.ArrayList;
 
-import Misc.ExitMethods;
-import Misc.ReadWriteFile;
-import Misc.UserInputMethods;
+import Misc.*;
 import users.Customer;
 
 
-public class NewCustomer {
-	private boolean exit = false;
+public class NewCustomer extends Transactions {
 	
-	public void createNewCust(String currUser, boolean exit){
+	public NewCustomer(){
+		super();
+		transaction = "newCustomer";
+	}
+	
+	public void createNewCust(String currUser){
 		System.out.println("To create a new account, we need a username, password and your name.");
 		System.out.println("Enter 'back' to go back to the login screen.");
 	
@@ -19,29 +21,27 @@ public class NewCustomer {
 		String inFirstName = inputName("Your first name", 50);
 		String inLastName = inputName("your last name", 50);
 		
-		if(exit == false){
-			ReadWriteFile.newUser(inUserName, inUserName, inPassword, "Cust", inFirstName, inLastName);
-			ReadWriteFile.recordActiv(currUser, "NewCust");
+		if(transExit == false){
+			ReadWriteFile.addUser(inUserName, inUserName, inPassword, "Cust", inFirstName, inLastName);
+			ReadWriteFile.recordActiv(currUser, "NewCust:" + inUserName);
 			System.out.println("Congratulations on opening a new Account");
 		}
-		
-		exit = false;
 	}
 
 	private String newUserName(int minLen, int maxLen){
 		boolean valid = false; 
 		
-		while (valid == false && exit == false){
+		while (valid == false && transExit == false){
 			System.out.print("New username (" + minLen + "-" + maxLen + " characters, may only contain letters and numbers): ");
 			String inUserName = UserInputMethods.scanStr(null);
 	
 			valid = UserInputMethods.checkLetNum(inUserName,minLen,maxLen);
-			exit = ExitMethods.exitCompare(inUserName, "back");
+			transExit = ExitMethods.exitCompare(inUserName, "back");
 	
-			if (valid == false && exit == false){
+			if (valid == false && transExit == false){
 				System.out.println("Invalid username.");
 			}
-			else if(valid == true && exit == false){
+			else if(valid == true && transExit == false){
 				valid = isUserNameInUse(inUserName);
 				
 				if(valid == false) return inUserName;
@@ -55,31 +55,32 @@ public class NewCustomer {
 		boolean valid = false;
 		boolean valid2 = false;
 		
-		while (valid == false  && exit == false){
+		while (valid == false  && transExit == false){
 			System.out.print("New Password (" + minLen + "-" + maxLen + " characters, may only contain letters and numbers): ");
 			String inPassword = UserInputMethods.scanStr(null);
 
 			valid = UserInputMethods.checkLetNum(inPassword,minLen,maxLen);
-			exit = ExitMethods.exitCompare(inPassword, "back");
+			transExit = ExitMethods.exitCompare(inPassword, "back");
 			
-			if (valid == true && exit == false){
+			if (valid == true && transExit == false){
 				System.out.print("Retype your new password: ");
 				String inPassword2 = UserInputMethods.scanStr(null);
 
 				if(inPassword.equals(inPassword2)) valid2 = true;
-				exit = ExitMethods.exitCompare(inPassword2, "back");
+				transExit = ExitMethods.exitCompare(inPassword2, "back");
 			}
 			
-			if (valid == true && valid2 == true && exit == false){
+			if (valid == true && valid2 == true && transExit == false){
 				System.out.println("Your new password is valid.");
 				return inPassword;
 			}
-			else if (valid == true && exit == false){
+			else if (valid == true && transExit == false){
 				System.out.println("Your passwords do not match.");
 				valid = false;
 			}
-			else if(exit == false)
+			else if(transExit == false){
 				System.out.println("Your password is not valid, try again.");
+			}
 		}
 		return null;
 	}
@@ -87,14 +88,17 @@ public class NewCustomer {
 	private String inputName(String label, int maxLen){
 		boolean valid = false;
 		
-		while (valid == false && exit == false){
+		while (valid == false && transExit == false){
 			System.out.println("Input " + label + " (only letters, max length of " + maxLen + "): ");
 			String inName = UserInputMethods.scanStr(null);
 	
 			valid = UserInputMethods.checkLetNum(inName,1,maxLen);
-			exit = ExitMethods.exitCompare(inName, "back");
+			transExit = ExitMethods.exitCompare(inName, "back");
 	
-			if(valid == false && exit == false){
+			if(valid == true && transExit == false){
+				return inName;
+			}
+			if(valid == false && transExit == false){
 				System.out.println("Please only use letters.");
 			}
 		}

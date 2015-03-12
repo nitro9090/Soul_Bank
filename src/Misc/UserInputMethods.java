@@ -2,20 +2,24 @@ package Misc;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import java.applet.*;
+import java.awt.*;
+import java.awt.event.*;
+
 public class UserInputMethods {
 	static Scanner sc = new Scanner(System.in);
 
-	public static String scanStr(String userName){
+	public static String scanStr(String currUserName){
 		String scanVal = sc.nextLine();
-		ExitMethods.exitNormal(scanVal, userName);
+		ExitMethods.exitNormal(scanVal, currUserName);
 		clearConsole();
 		return scanVal;
 	}
 
-	public static int scanInt(String userName){
+	public static int scanInt(String currUserName){
 		int Output = -1;
 		String scanVal = sc.nextLine();
-		ExitMethods.exitNormal(scanVal, userName);
+		ExitMethods.exitNormal(scanVal, currUserName);
 		clearConsole();
 		try{
 			Output = Integer.parseInt(scanVal);
@@ -24,9 +28,9 @@ public class UserInputMethods {
 		return Output;
 	}
 	
-	public static Double scanDbl(String userName, int numDec){
+	public static Double scanDbl(String currUserName, int numDec){
 		String scanVal = sc.nextLine();
-		ExitMethods.exitNormal(scanVal, userName);
+		ExitMethods.exitNormal(scanVal, currUserName);
 		boolean check = decCheck(scanVal, numDec);
 		clearConsole();
 		if(check == true){
@@ -70,7 +74,7 @@ public class UserInputMethods {
 	}
 	
 	public static boolean decCheck(String input, int numDec){
-	    if(input.contains("\\.")){
+	    if(input.contains(".")){
 	    	String[] splitDouble = input.split("\\.");
 	    	if (splitDouble[1].length() <= numDec){
 				return true;
@@ -80,9 +84,9 @@ public class UserInputMethods {
 	    return true;
 	}
 	
-	public static String scanPwd(String userName, String dialogue) {
+	public static String scanPwd(String currUserName, String dialogue) {
 		System.out.print("Password: ");
-		String pwdStr = scanStr(userName);
+		String pwdStr = scanStr(currUserName);
 		
 		/*String pwdStr = "boogie";
 		
@@ -105,4 +109,16 @@ public class UserInputMethods {
 		clearConsole();*/
 		return pwdStr;
     }
+
+	public static String inputYN(String currUserName){
+		String isYN = UserInputMethods.scanStr(currUserName);
+
+		if(isYN.equals("Y") || isYN.equals("N")){	
+			return isYN;
+		}
+		else {
+			MiscMeth.invSelect();
+			return null;
+		}
+	}
 }

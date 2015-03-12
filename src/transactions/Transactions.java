@@ -1,174 +1,152 @@
 package transactions;
 
+import java.util.ArrayList;
+
 import Misc.MiscMeth;
 import Misc.UserInputMethods;
 import users.Customer;
+import users.User;
 
 public class Transactions {
-	protected String currUser;  //the userName of the user doing the transaction
+	protected User currUser;  //the userName of the user doing the transaction
 	protected Customer transCust;  //the customer the transaction is applied to
-	protected String transaction = null;  //the transaction being done
+	protected String transaction = "null";  //the transaction being done
 	protected int repNum1 = -1;  // if a repository number is needed for the transaction, it can be loaded here
 	protected int repNum2 = -1;  // if a 2nd repository number is needed for the transaction, it can be loaded here
-	protected double transVal = -1; // if an amount is being transferred, this value will be used
-	protected boolean exit = false; // the exit token
+	protected double transVal = 0; // if an amount is being transferred, this value will be used
+	protected boolean transExit = false; // the exit token
 	
-	public Transactions(String user, Customer transactionUser, String currTrans){
-		currUser = user;
+	public Transactions(){
+		currUser = null;
+		transCust = null;
+		transaction = "null"; 
+	}
+	
+	public Transactions(User CurrentUser, Customer transactionUser, String currTrans){
+		currUser = CurrentUser;
 		transCust = transactionUser;
 		transaction = currTrans; 
 	}
+
+	public void setTransExit(boolean exit) {
+		transExit = exit;
+	}
 	
+	public void setRepType(String repType){
+		System.out.println("Error: setRepType in Transactions is being called.");
+		transExit = true;
+	}
+
 	public String getCurrUserName(){
-		return currUser;
+		return currUser.getUserName();
 	}
 	
 	public Customer getTransUser(){
 		return transCust;
 	}
 	
-	protected int chooseRep(boolean exit, Customer customer, boolean inclEmptReps){
-		int repSize = customer.getRep().size();
-		int repNum = -1;
-		boolean check = false;
+	public String getNewRepType(){
+		System.out.println("getNewRepType in Transactions is being called wrong");
+		return null;
+	}
+	
+	public int getRepNum1(){
+		return repNum1;
+	}
+
+	public int getRepNum2(){
+		return repNum2;
+	}
+	
+	public boolean getTransExit() {
+		return transExit;
+	}
+	
+	protected boolean mainDoubleCheck(){
+		System.out.println("type (Y) for yes or (N) for no.");
+		String isYN = UserInputMethods.inputYN(currUser.getUserName());
 		
-		breakWhile:
-		while (exit == false){
-			
-			int countReps = customer.listReps(-1, -1, -1, inclEmptReps);
-			
-			if (countReps == 0){
-				System.out.println("This transaction is not possible with these accounts.");
-				exit = true;
-				break;
-			}
+		if(isYN.equals("Y")){
+			return true;
+		}
+		else if(isYN.equals("N")){
+			transExit = true;
+			return false;
+		}
+		else{
+			return false;
+		}
+	}
+	
+	public void haveReps(){
+		if (transCust.getRep().isEmpty()){
+			System.out.printf("This account does not have any repositories.  You are being returned to the main menu. \n");
+			setTransExit(true);
+		}
+	}
+	
+	public int chooseARep(boolean inclEmptReps, int skipRep1, int skipRep2, int skipRep3, String question){
+		int repSize = transCust.getRep().size();
+		int repCount = transCust.listReps(false, inclEmptReps, skipRep1, skipRep2, skipRep3);
+		
+		if (repSize == 0  && !transExit){
+			System.out.println("You do not have any repositories.  Please choose another option.");
+			transExit = true;
+		}
+		else if(repCount == 0 && !transExit){
+			System.out.println("All of your repositories are empty. Please choose another option.");
+			transExit = true;
+		}
+	
+		while (!transExit){
+			System.out.println(question);
+			transCust.listReps(true, inclEmptReps, skipRep1, skipRep2, skipRep3);
 			
 			System.out.printf("(%d) Cancel the transaction \n", repSize+1);
 	
-			int choice = UserInputMethods.scanInt(customer.getUserName());
+			int choice = UserInputMethods.scanInt(transCust.getUserName());
 	
 			for(int j = 0; j < repSize; j++){
-				int repNumList = customer.getRepNum(j);
-				if(inclEmptReps == false && choice == j+1 && customer.getRepBal(repNumList) == 0){
-					MiscMeth.invSelect();
-					check = true;
+				int repNumList = transCust.getRepNum(j);
+				if(inclEmptReps == false && choice == j+1 && transCust.getRepBal(repNumList) == 0){
+				}
+				else if((choice == j+1 && skipRep1 == repNumList)||(choice == j+1 && skipRep2 == repNumList)||(choice == j+1 && skipRep3 == repNumList)){
 				}
 				else if(choice == j+1){
-					repNum = repNumList;
-					break breakWhile;
+					return repNumList;
 				}
 			}
 			if(choice == repSize+1){
 				System.out.println("You are being returned to the main menu.");
-				exit = true;
+				transExit = true;
 			}
-			else if(check == false) MiscMeth.invSelect();
+			else MiscMeth.invSelect();
 		}
-		return repNum;
+		return -1;
 	}
 
+	public void startTrans(){
+		System.out.println("This transaction is not setup.");
+		transExit = true;
+	}
+	
 	public void transDesc(){
 		System.out.println("Error: not reaching the appropriate Transaction.");
 	}
 	
-	public void doTrans(){
-		
+	protected void doTrans(){
+		System.out.println("Error: This transaction cannot be finalized, because it is not setup.");
 	}
 	
-	public void transComplete(){
+	protected void transComplete(){
 		System.out.println("Error: not reaching the appropriate Transaction.");
 	}
 	
-	protected void transValPrompt(int outRepNum){
-		double inTransVal = UserInputMethods.scanDbl(transCust.getUserName(), 2);
-
-		if(transVal > 0){
-			if (transVal > transCust.getRepBal(outRepNum)){
-				System.out.println("You do not have enough souls in your account, please give a different amount.");
-			}
-			else{
-				transVal = inTransVal;
-			}
+	protected void requiredReps(int requiredNum){
+		int repSize = transCust.getRep().size();
+		if (repSize < requiredNum){
+			System.out.printf("You need to have at least %d repositories to take this action.  You currently have %d repository \n",requiredNum, repSize);
+			transExit = true;
 		}
-		else MiscMeth.invAmt();	
-	}
-
-	private double amtToTransPrompt(boolean exit, int repNumTo, Customer customerTo, int repNumFrom, Customer customerFrom){
-		double transVal = 0;
-		
-		breakWhile:
-		while (exit == false && customer.getRep().size() > 0){
-			if(transType.equals("Transfer")){
-				System.out.println("Your transaction will be");
-				System.out.printf("account # %d %s with %.2f souls ---> account # %d %s with %.2f souls \n", repNumFrom, customerFrom.getRepType(repNumFrom), customerFrom.getRepBal(repNumFrom), repNumTo, customerTo.getRepType(repNumTo), customerTo.getRepBal(repNumTo));
-				System.out.println("How much would you like to transfer? You will have a chance to verify the transfer.");
-			}
-			else if(transType.equals("Deposit")){
-				
-			}
-			else if(transType.equals("Extract")){
-				System.out.printf("You will be extracting from account # %d %s which currently has %.2f souls \n", repNumFrom, customerFrom.getRepType(repNumFrom), customerFrom.getRepBal(repNumFrom));
-				System.out.println("How much would you like to extract? You will have a chance to verify the transfer.");
-			}
-			else if(transType.equals("Donate")){
-				System.out.printf("You will be donating from account # %d %s which currently has %.2f souls \n", repNumFrom, customerFrom.getRepType(repNumFrom), customerFrom.getRepBal(repNumFrom));
-				System.out.println("How much would you like to donate? You will have a chance to verify the transfer.");
-			}
-	
-			transVal = UserInputMethods.scanDbl(customer.getUserName(), 2);
-	
-			if(transVal > 0){
-				if (transType.equals("Deposit") || transVal <= customerFrom.getRepBal(repNumFrom)) break breakWhile;
-				else if (transVal > customerFrom.getRepBal(repNumFrom)){
-					System.out.println("You do not have enough souls in your account, please give a different amount.");
-				}
-			}
-			else MiscMeth.invAmt();
-		}	
-		return transVal;
-	}
-
-	protected static int choose2ndRepPrompt(Customer customer, boolean finalTrans, boolean inclEmptReps, int firstRepNum, String question) {
-		int repNum = -1;
-		int repSize = customer.getRep().size();
-		boolean check = false;
-	
-		while (exit == false){
-			System.out.println(question);
-			int countReps = listReps(customer, firstRepNum, -1, -1, inclEmptReps);
-	
-			if (countReps == 0){
-				System.out.println("This transaction is not possible with these accounts.");
-				exit = true;
-				break;
-			}
-			
-			System.out.printf("(%d) Cancel the transfer \n", repSize+1);
-	
-			int choice = UserInputMethods.scanInt(customer.getUserName());
-	
-			for(int j = 0; j< repSize; j++){ 
-				int repNumList = customer.getRepNum(j);
-				if(inclEmptReps == false && choice == j+1 && customer.getRepBal(repNumList) == 0){
-					MiscMeth.invSelect();
-					check = true;
-				}
-				if(choice == j+1 && repNumList != firstRepNum && customer.getRepBal(repNumList) != 0){
-					return repNum = customer.getRepNum(j);
-				}
-			}
-			if(choice == repSize+1){
-				System.out.println("You are being returned to the previous menu.");
-				exit = true;
-			}
-			else if(check == false) MiscMeth.invSelect();
-		}
-		if(finalTrans == true) exit = false;
-		return repNum;
-	}
-	
-	public void doubleCheckPrompt(){
-		System.out.println("Are you sure you want to proceed with this transaction?")
-		isYN
 	}
 }

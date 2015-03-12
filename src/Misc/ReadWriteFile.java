@@ -12,6 +12,7 @@ import repositories.Repositories;
 import users.Admin;
 import users.Customer;
 import users.User;
+import users.UserActiv;
 
 public class ReadWriteFile{
 	public static void appendToFile(String filename, String fileData){
@@ -22,6 +23,20 @@ public class ReadWriteFile{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void addRep(String repUserName, int repNum, String repType, Double repBal){
+		String filename = "Repositories.txt";
+		String FileData = repUserName + " " + repNum + " " + repType + " " + repBal;
+		
+		appendToFile(filename, FileData);
+	}
+	
+	public static void addUser(String customer, String userName, String pwd, String acctType, String firstName, String lastName){
+		String filename= "Users.txt";
+		String FileData = userName + " " + pwd + " " + acctType + " " + firstName + " " + lastName;
+		
+		appendToFile(filename, FileData);
 	}
 	
 	public static void replaceFile(String filename, String fileData){
@@ -45,8 +60,8 @@ public class ReadWriteFile{
 		}
 	}
 
-	public static int recordActiv(String userName, String action){
-		String fileName = "CustomerActivity.txt";
+	public static int recordActiv(String currUser, String action){
+		String fileName = "UserActivity.txt";
 		String persLabel = "ActivityNum";
 		int activNum = findPersValInt(persLabel);
 		
@@ -54,7 +69,7 @@ public class ReadWriteFile{
 		Date date = new Date();
 		dateFormat.format(date);
 		
-		String record = userName + " " + activNum + " " + dateFormat.format(date) + " " + action;
+		String record = currUser + " " + activNum + " " + dateFormat.format(date) + " " + action;
 		
 		appendToFile(fileName, record);
 		
@@ -358,6 +373,36 @@ public class ReadWriteFile{
 		return repActiv;
 	}
 	
+	public static UserActiv loadUserActiv(int currActivNum){
+		Scanner sc1 = null;
+		
+		try {
+			sc1 = new Scanner(new File("UserActivity.txt"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		while(sc1.hasNext()){
+			String userName = sc1.next();
+			int activNum = Integer.parseInt(sc1.next());
+			String date = sc1.next();
+			String time = sc1.next();
+			String action = sc1.next();
+			
+			if(currActivNum == activNum){
+				UserActiv temp = new UserActiv(userName, activNum, date, time, action);
+				sc1.close();
+				return temp;
+			}
+		}
+		
+		sc1.close();
+		
+		System.out.println("ReadWriteFile.loadUserActiv couldn't find the User Activity.");
+		return null;
+	}
+	
 	public static int findPersValInt(String label){
 		ArrayList<PersVals> persVals = loadPersVals();
 		int persSize = persVals.size();
@@ -370,15 +415,11 @@ public class ReadWriteFile{
 		return -1;
 	}
 	
-	public static void updPersValStr(String persLabel, String newVal){
-		updPersVal(persLabel, newVal);
-	}
-	
 	public static void updPersValInt(String persLabel, int newVal){
-		updPersVal(persLabel, Integer.toString(newVal));
+		updPersValStr(persLabel, Integer.toString(newVal));
 	}
 	
-	public static void updPersVal(String persLabel, String newVal){
+	public static void updPersValStr(String persLabel, String newVal){
 		ArrayList<PersVals> persVals = loadPersVals();
 		ArrayList<String> newPersVals = new ArrayList<>();
 		int persSize = persVals.size();
@@ -512,12 +553,5 @@ public class ReadWriteFile{
 		
 		//replaces file with the newly editted values
 		rewriteFile(fileName, darkDons);
-	}
-	
-	public static void newUser(String customer, String userName, String pwd, String acctType, String firstName, String lastName){
-		String filename= "Users.txt";
-		String FileData = userName + " " + pwd + " " + acctType + " " + firstName + " " + lastName;
-		
-		appendToFile(filename, FileData);
 	}
 }

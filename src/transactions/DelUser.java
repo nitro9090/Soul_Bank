@@ -1,10 +1,10 @@
 package transactions;
 
-import users.Customer;
+import users.*;
 
-public class DelUser extends Transactions {
+public class DelUser extends CloseAccts {
 	
-	public DelUser(String currUser, Customer closingUser){
+	public DelUser(User currUser, Customer closingUser){
 		super(currUser, closingUser, "DelUser");
 	}
 	

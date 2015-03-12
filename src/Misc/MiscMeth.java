@@ -8,6 +8,4 @@ public class MiscMeth {
 	public static void invAmt(){
 		System.out.println("Invalid Amount!");
 	}
-	
-	
 }
