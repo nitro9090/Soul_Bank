@@ -13,11 +13,11 @@ public class NewCustomer extends Transactions {
 	}
 	
 	public void createNewCust(String currUser){
-		System.out.println("To create a new account, we need a username, password and your name.");
+		System.out.println("To create a new account, we need a username, password, first and last name.");
 		System.out.println("Enter 'back' to go back to the login screen.");
 	
-		String inUserName = newUserName(5, 10);
-		String inPassword = newPassword(5, 10);
+		String inUserName = newUserName(5, 10); //min userName length should more than 5 or more since "null" is used as a filler
+		String inPassword = newPassword(5, 10); //min password length should more than 5 or more since "null" is used as a filler
 		String inFirstName = inputName("Your first name", 50);
 		String inLastName = inputName("your last name", 50);
 		
@@ -36,7 +36,7 @@ public class NewCustomer extends Transactions {
 			String inUserName = UserInputMethods.scanStr(null);
 	
 			valid = UserInputMethods.checkLetNum(inUserName,minLen,maxLen);
-			transExit = ExitMethods.exitCompare(inUserName, "back");
+			transExit = MiscMeth.compareStrings(inUserName, "back");
 	
 			if (valid == false && transExit == false){
 				System.out.println("Invalid username.");
@@ -60,14 +60,14 @@ public class NewCustomer extends Transactions {
 			String inPassword = UserInputMethods.scanStr(null);
 
 			valid = UserInputMethods.checkLetNum(inPassword,minLen,maxLen);
-			transExit = ExitMethods.exitCompare(inPassword, "back");
+			transExit = MiscMeth.compareStrings(inPassword, "back");
 			
 			if (valid == true && transExit == false){
 				System.out.print("Retype your new password: ");
 				String inPassword2 = UserInputMethods.scanStr(null);
 
 				if(inPassword.equals(inPassword2)) valid2 = true;
-				transExit = ExitMethods.exitCompare(inPassword2, "back");
+				transExit = MiscMeth.compareStrings(inPassword2, "back");
 			}
 			
 			if (valid == true && valid2 == true && transExit == false){
@@ -93,7 +93,7 @@ public class NewCustomer extends Transactions {
 			String inName = UserInputMethods.scanStr(null);
 	
 			valid = UserInputMethods.checkLetNum(inName,1,maxLen);
-			transExit = ExitMethods.exitCompare(inName, "back");
+			transExit = MiscMeth.compareStrings(inName, "back");
 	
 			if(valid == true && transExit == false){
 				return inName;

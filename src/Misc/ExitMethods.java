@@ -33,11 +33,4 @@ public class ExitMethods {
 		ReadWriteFile.recordActiv("null", "BadLogin");
 		System.exit(0);
 	}
-	
-	public static boolean exitCompare(String value, String check){
-		if(value.equals(check)){
-			return true;
-		}
-		return false;
-	}
 }

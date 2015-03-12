@@ -12,12 +12,13 @@ public class Customer extends User{
 	ArrayList<Repositories> repositories; 
 	
 	public Customer(){
+		super();
 		repositories = new ArrayList<>(); 
 	}
 	
-	public Customer(User customer){
-		super(customer.getUserName(), customer.getPassword(),customer.getAcctType(), customer.getFirstName(), customer.getLastName());
-		repositories = ReadWriteFile.loadRep(customer.getUserName());
+	public Customer(String userName){
+		super(userName);
+		repositories = ReadWriteFile.loadRep(userName);
 	}
 	
 	public Customer (String UN, String PW, String UT, String FN, String LN){
@@ -80,17 +81,16 @@ public class Customer extends User{
 	}
 	
 	public void mainMenu(){
-		//in case someone gets into the MainMenu without a user name
-		if(userName == null){
-			mainExit = true;
-			ExitMethods.exitCommBad();
-		}
-	
-		Customer customer = ReadWriteFile.loadCustomer(userName);
+		//The main menu for a customer, it lists all of the customer's account options.
 	
 		System.out.println("Welcome to the main menu, what would you like to do?");
-	
-		while (mainExit == false){
+		
+		while (!mainExit){
+			//nulls out any previous transactions
+			currTrans = new Transactions(this,this, "null");
+			secTrans = new Transactions(this,this, "null");
+			
+			//A basic customers main menu
 			System.out.println("(1) Open New Repository");
 			System.out.println("(2) Check your balance");
 			System.out.println("(3) Transfer/extract/deposit souls");
@@ -123,13 +123,13 @@ public class Customer extends User{
 				currTrans.setTransExit(true);
 			}
 			
-			if(customer.getUserName() != null && !currTrans.getTransExit() && !mainExit){
+			if(!currTrans.getTransExit() && !mainExit){
 				currTrans.startTrans();
 				returnToMainDial();
 				UserInputMethods.scanStr(userName);
 				backMain();
 			}
-			else if(customer.getUserName() != null && currTrans.getTransExit()){
+			else if(currTrans.getTransExit()){
 				returnToMainDial();
 				UserInputMethods.scanStr(userName);
 				backMain();

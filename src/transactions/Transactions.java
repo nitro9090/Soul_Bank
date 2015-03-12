@@ -19,7 +19,11 @@ public class Transactions {
 	public Transactions(){
 		currUser = null;
 		transCust = null;
-		transaction = "null"; 
+	}
+	
+	public Transactions(User currentUser){
+		currUser = currentUser;
+		transCust = null;
 	}
 	
 	public Transactions(User CurrentUser, Customer transactionUser, String currTrans){
@@ -36,6 +40,11 @@ public class Transactions {
 		System.out.println("Error: setRepType in Transactions is being called.");
 		transExit = true;
 	}
+	
+	public void setRepNum1(int repNum){
+		repNum1 = repNum;
+	}
+
 
 	public String getCurrUserName(){
 		return currUser.getUserName();
@@ -117,7 +126,6 @@ public class Transactions {
 				}
 			}
 			if(choice == repSize+1){
-				System.out.println("You are being returned to the main menu.");
 				transExit = true;
 			}
 			else MiscMeth.invSelect();
@@ -148,5 +156,9 @@ public class Transactions {
 			System.out.printf("You need to have at least %d repositories to take this action.  You currently have %d repository \n",requiredNum, repSize);
 			transExit = true;
 		}
+	}
+
+	public void setAuthentication(boolean authenticated) {
+		System.out.println("Error: set Authentication isn't setup for this Transaction");
 	}
 }

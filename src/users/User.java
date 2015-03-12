@@ -31,14 +31,6 @@ public class User {
 		lastName = "null";
 	}
 	
-	public User(String uN, String pW, String uT, String fN, String lN){
-		userName = uN;
-		password = pW;
-		acctType = uT;
-		firstName = fN;
-		lastName = lN;
-	}
-	
 	public User(String uN){
 		User temp = ReadWriteFile.loadUser(uN);
 		userName = uN;
@@ -46,6 +38,14 @@ public class User {
 		acctType = temp.getAcctType();
 		firstName = temp.getFirstName();
 		lastName = temp.getLastName();
+	}
+	
+	public User(String uN, String pW, String uT, String fN, String lN){
+		userName = uN;
+		password = pW;
+		acctType = uT;
+		firstName = fN;
+		lastName = lN;
 	}
 	
 	public String getUserName(){
@@ -72,21 +72,16 @@ public class User {
 		return authenticated;
 	}
 	
+	public Transactions getCurrTrans(){
+		return currTrans;
+	}
+	
 	public Transactions getSecTrans(){
 		return secTrans;
 	}
 	
 	public boolean getExit(){
 		return mainExit;
-	}
-	
-	public void setUser(String uN){
-		User temp = ReadWriteFile.loadUser(uN);
-		userName = uN;
-		password = temp.getPassword();
-		acctType = temp.getAcctType();
-		firstName = temp.getFirstName();
-		lastName = temp.getLastName();
 	}
 	
 	public void setUserName(String uN){
@@ -113,14 +108,18 @@ public class User {
 		acctType = uT;
 	}
 	
-	public void setSecTrans(Transactions T){
-		secTrans = T;
+	public void setCurrTrans(Transactions CT){
+		secTrans = CT;
+	}
+	
+	public void setSecTrans(Transactions ST){
+		secTrans = ST;
 	}
 	
 	public void setExit(boolean inExit){
 		mainExit = inExit;
 	}
-	
+
 	public void refreshRepList(){
 		//if the user is a customer then this will refresh their repository list, otherwise it does nothing.
 	}
@@ -129,85 +128,13 @@ public class User {
 		System.out.println("The main menu for this account type has not been setup.");
 	}
 
-	/*public String Login(){	
-		ArrayList<Customer> customers = ReadWriteFile.loadCustomers();
-		
-		while (exit == false){
-			String inPassword = null;
-			System.out.println("Enter 'back' to go back to the login screen");
-			System.out.print("Username: ");
-			
-			String inUserName = UserInputMethods.scanStr("null");
-			exit = ExitMethods.exitCompare(inUserName, "back");
-			
-			if(exit == false){
-				//System.out.print("Password: ");
-				inPassword = UserInputMethods.scanPwd(inUserName, "Password: ");
-				ExitMethods.exitCompare(inUserName, "back");
-			}
-			
-			if(exit == false){
-				for(int i = 0; i<customers.size(); i++){
-					if (inUserName.equals(customers.get(i).getUserName())){
-						if (inPassword.equals(customers.get(i).getPassword())){
-							ReadWriteFile.recordActiv(inUserName, "Login");
-							return inUserName;
-						}
-						else{
-							System.out.println("Username and/or password do not match or exist, try again.");
-							ReadWriteFile.recordActiv(inUserName, "FailedLogin");
-						}
-					}
-					else if(i == customers.size()-1){
-						System.out.println("Username and/or password do not match or exist, try again.");
-						ReadWriteFile.recordActiv(inUserName, "FailedLogin");
-					}
-				}
-			}
-		}
-		return null;
-	}*/
-
-	public void authentUser(){
-		String inPassword = null;
-		
-		System.out.println("Enter 'back' to go back to the login screen");
-		System.out.print("Username: ");
-
-		String inUserName = UserInputMethods.scanStr(null);
-		mainExit = ExitMethods.exitCompare(inUserName, "back");
-
-		if(mainExit == false){
-			inPassword = UserInputMethods.scanPwd(inUserName, "Password: ");
-			mainExit = ExitMethods.exitCompare(inPassword, "back");
-		}
-
-		if(mainExit == false){
-			ArrayList<User> users = ReadWriteFile.loadUsers();
-			for(int i = 0; i<users.size(); i++){
-				if (inUserName.equals(users.get(i).getUserName())){
-					if (inPassword.equals(users.get(i).getPassword())){
-						setUser(inUserName);
-						ReadWriteFile.recordActiv(inUserName, "Login");
-						authenticated = true;
-						break;
-					}
-				}
-				else if(i == users.size()-1){
-					System.out.println("Username and/or password do not match or exist, try again.");
-					authenticated = false;
-					ReadWriteFile.recordActiv(userName, "FailedLogin:" + inUserName);
-				}
-			}
-		}
-	}
-
+	
 	protected static void backMain() {
 		System.out.println("Welcome back to the main menu, your options are:");
 	}
 	
 	public static void returnToMainDial(){
-		System.out.println("You are being returned to the main menu.");
+		if(!mainExit) System.out.println("You are being returned to the main menu.");
 	}
 	
 	public String newRepMenu(){	
@@ -220,67 +147,10 @@ public class User {
 		System.out.println("Checking balances has not been setup for this account type.");
 		mainExit = true;
 	}
-	
-	protected void depSouls(int repNum,  double transVal){
-		String action = "Deposit";
-		
-		ReadWriteFile.transferSouls(true, false, repNum, -1, transVal);
-		int activNum = ReadWriteFile.recordActiv(userName, "Deposit");
-		ReadWriteFile.recordRepActiv(activNum, repNum, action, transVal);
-	}
 
-	protected void extractSouls(int repNum, double transVal){
-		String action = "Extract";
-				
-		ReadWriteFile.transferSouls(false, true, -1, repNum, transVal);
-		int activNum = ReadWriteFile.recordActiv(userName, action);
-		ReadWriteFile.recordRepActiv(activNum, repNum, action, -transVal);
+	public void amtToTransDial() {
+		System.out.println("Error: The dialogue for transfer amounts has been setup");
 	}
-
-	public void newRep(String repUserName, String repType, double inRepBal){
-		if (mainExit == false){
-			String action = "NewRep";
-			String filename = "Repositories.txt";
-			
-			int newRepNum = ReadWriteFile.findPersValInt("NewRepNum");
-			ReadWriteFile.updPersValInt("NewRepNum", newRepNum+1);
-			
-			String FileData = repUserName + " " + newRepNum + " " + repType + " " + inRepBal;
-			ReadWriteFile.appendToFile(filename, FileData);
-			
-			int activNum = ReadWriteFile.recordActiv(getUserName(), action);
-			ReadWriteFile.recordRepActiv(activNum, newRepNum, action, inRepBal);
-		}
-	}
-
-	protected void deleteUser(String customerToDel){
-		Customer delCustomer = ReadWriteFile.loadCustomer(customerToDel);
-		String action = "DelCust";
-		
-		for (int i = 0; i < delCustomer.getRep().size(); i++){
-			int delRepNum = delCustomer.getRepNum(i);
-			deleteRep(delRepNum);
-		}
-		
-		ReadWriteFile.deleteCust(delCustomer.getUserName());
-		ReadWriteFile.recordActiv(userName, action);
-		
-		System.out.println(delCustomer.getUserName() + "'s customer account has been closed");
-		
-		if(userName.equals(delCustomer.getUserName()) ){
-			authenticated = false;
-			userName = null;
-			mainExit = true;
-		}
-	}
-
-	protected void deleteRep(int delRepNum){
-		String action = "DelRep";
-	
-		ReadWriteFile.deleteRep(delRepNum);
-		int activNum = ReadWriteFile.recordActiv(userName, action);
-		ReadWriteFile.recordRepActiv(activNum, delRepNum, action, 0);
-		}
 
 	public void donateSouls(String donUserName, int repNum, double transVal, String transType){
 		String action = "Donate";
@@ -494,91 +364,6 @@ public class User {
 		ReadWriteFile.recordRepActiv(activNum, repNum, action, 0);
 	}
 
-	protected void repHasSoul(Customer customer, Repositories rep, boolean allowTrans, boolean allowExtr, boolean allowNewRep, boolean allowDon){
-		double transVal = 0;
-		int newRepNum = -1;
-		int repSize = customer.getRep().size();
-	
-		//When attempting to close an account, this method checks to see if the account is empty 
-		//and gives the user options on how to empty the account.
-		if(mainExit == false){
-			while (closingRep.getRepBal() != 0) {
-				boolean check = false;
-				//menu on how to empty the account with souls in it.
-				System.out.println("account # : " +  closingRepNum + " has " + customer.getRepBal(closingRepNum) + " souls in it, you must empty the account in order to close it.");
-				if(allowTrans == true){
-					if (repSize == 1) System.out.println("Note, you are attempting to close your final account.");
-					System.out.println("You may either: ");
-					if (repSize != 1) System.out.println("Transfer all of the souls into the below accounts.");
-					listReps(customer, closingRepNum, 0, 0, true);
-				}
-				if(allowExtr == true){
-					System.out.printf("(%d) Extract all of the souls\n", repSize+1);
-				}
-				if(allowNewRep == true){
-					System.out.printf("(%d) Create a new repository and move all of the souls into it\n", repSize+2);
-				}
-				if(allowDon == true){
-					System.out.printf("(%d) Donate all of the souls to the Dark Ones\n", repSize+3);
-				}
-				System.out.printf("(%d) Return to previous menu\n", repSize+4);
-	
-				int choice = UserInputMethods.scanInt(customer.getUserName());
-	
-				//transfers all of the souls into another account
-				for(int i = 0; i< repSize; i++){
-					if (choice == i+1 && allowTrans){
-						int repNumTo = customer.getRepNum(i); 
-						customer = actionDoubleCheck(customer, "Transfer", false, customer.getRepBal(closingRepNum), repNumTo, customer, closingRepNum, customer, null);
-						check = true;
-					}
-				}
-				//extracts all of the souls from the account
-				if(choice == repSize+1 && allowExtr){
-					actionDoubleCheck("Extract", false, customer.getRepBal(closingRepNum), -1, null, closingRepNum, customer, null);
-				}
-				//creates a new repository, then transfers all of the souls into that new account.
-				else if(choice == repSize+2 && allowNewRep){
-					Customer customer1 = CustomerMenus.newRepMenu(customer, false);
-	
-					int cust1size = customer1.getRep().size();
-	
-					if(mainExit == false){
-						for(int j = 0; j < cust1size ; j++){
-							for(int k = 0; k < repSize; k++){
-								if(customer1.getRepNum(j) == customer.getRepNum(k)){
-									break;
-								}
-								else if(k == repSize - 1){
-									newRepNum = customer1.getRepNum(j);
-								}
-							}
-						}
-						customer = customer1;
-						transVal = customer.getRepBal(closingRepNum);
-					}
-					customer = actionDoubleCheck(customer, "Transfer", false, transVal, newRepNum, customer, closingRepNum, customer, null);
-				}
-	
-				// Donate your souls to the dark ones (aka empties the account to nowhere)
-				// needs help
-				else if(choice == repSize+3 && allowDon){
-					ArrayList<Donations> donations = new ArrayList<>();
-					Donations temp = new Donations(closingRepNum, customer.getRepBal(closingRepNum));
-					donations.add(temp);
-					customer = CustomerMenus.devilDealMenu(customer, false, donations);
-				}
-				//Exits the menu
-				else if(choice == repSize+4){
-					mainExit = true;
-					break;
-				}
-				else if(check == false) MiscMeth.invSelect();
-			}
-		}
-		return customer;
-	}
-
 	private void actionDoubleCheck(String action, boolean finalTrans, double transVal, Repositories repsTo, Repositories repsFrom, String repType){
 		breakWhile:
 		while (mainExit == false){
@@ -653,9 +438,5 @@ public class User {
 				mainExit = true;
 			}	
 		}
-	}
-
-	public void amtToTransDial() {
-		System.out.println("Error: The dialogue for transfer amounts has been setup");
 	}
 }

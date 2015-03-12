@@ -12,8 +12,8 @@ import Misc.UserInputMethods;
 public class Admin extends User{
 
 
-	public Admin(){
-
+	public Admin(String uN){
+		super(uN);
 	}
 
 	public Admin (String uN, String pW, String uT, String fN, String lN){

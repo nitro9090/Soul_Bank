@@ -243,7 +243,7 @@ public class ReadWriteFile{
 		
 		for(int i = 0; i < users.size(); i++){
 			if(users.get(i).getAcctType().equals("Cust")){
-				Customer temp = new Customer(users.get(i));
+				Customer temp = new Customer(users.get(i).getUserName());
 				customers.add(temp);
 			}	
 		}
@@ -475,20 +475,21 @@ public class ReadWriteFile{
 		}
 	}
 
-	public static void deleteCust(String customer){
-		ArrayList<Customer> allCustomers = loadCustomers();
+	public static void deleteUser(String userName){
+		ArrayList<User> allUsers = loadUsers();
 		boolean firstWrite = true;
-		String fileName = "Customers.txt";
-		int custSize = allCustomers.size();
+		String fileName = "Users.txt";
+		int userSize = allUsers.size();
 
-		for(int i = 0; i < custSize; i++){
-			if(!customer.equals(allCustomers.get(i).getUserName())){	
+		for(int i = 0; i < userSize; i++){
+			if(!userName.equals(allUsers.get(i).getUserName())){	
 				StringBuilder temp = new StringBuilder(); 
 				
-				temp.append(allCustomers.get(i).getUserName()).append(" ");
-				temp.append(allCustomers.get(i).getPassword()).append(" ");
-				temp.append(allCustomers.get(i).getFirstName()).append(" ");
-				temp.append(allCustomers.get(i).getLastName());
+				temp.append(allUsers.get(i).getUserName()).append(" ");
+				temp.append(allUsers.get(i).getPassword()).append(" ");
+				temp.append(allUsers.get(i).getAcctType()).append(" ");
+				temp.append(allUsers.get(i).getFirstName()).append(" ");
+				temp.append(allUsers.get(i).getLastName());
 
 				String temp2 = temp.toString();
 

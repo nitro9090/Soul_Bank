@@ -8,6 +8,8 @@ import users.Customer;
 import users.User;
 
 public class CloseAccts extends Transactions {
+	boolean authenticated = false;
+	boolean check = false;
 
 	public CloseAccts(User currUser, Customer transUser){
 		super(currUser, transUser, "closeAccts");
@@ -17,14 +19,23 @@ public class CloseAccts extends Transactions {
 		super(currUser, transUser, transType);
 	}
 	
-	protected void repHasSoul(int repNumClosing, boolean allowTrans, boolean allowExtr, boolean allowNewRep, boolean allowDon){
+	public void setAuthentication(boolean authent){
+		authenticated = authent;
+	}
+	
+	public void setCheck(boolean checkVal){
+		check = checkVal;
+	}
+	
+	protected boolean repHasSoul(int repNumClosing, boolean allowTrans, boolean allowExtr, boolean allowNewRep, boolean allowDon){
 		int repSize = transCust.getRep().size();
-
+		boolean didRepHaveSouls = false;
 
 		//When attempting to close an account, this method checks to see if the account is empty 
 		//and gives the user options on how to empty the account.
 		
 		while (transCust.getRepBal(repNumClosing) != 0 && !transExit) {
+			didRepHaveSouls = true;
 			Transactions temp = new Transactions();
 			boolean check = false;
 			//menu on how to empty the account with souls in it.
@@ -51,16 +62,19 @@ public class CloseAccts extends Transactions {
 			int choice = UserInputMethods.scanInt(currUser.getUserName());
 
 			//transfers all of the souls into another account
-			for(int i = 0; i< repSize; i++){
-				if (choice == i+1 && allowTrans){
-					int repNumTo = transCust.getRepNum(i); 
-					if(repNumTo != repNumClosing){
-						temp = new Transfer(currUser, transCust, repNumClosing, repNumTo, transCust.getRepBal(repNumClosing));
-						currUser.setSecTrans(temp);
-						check = true;
+			if(allowTrans){
+				for(int i = 0; i< repSize; i++){
+					if (choice == i+1){
+						int repNumTo = transCust.getRepNum(i); 
+						if(repNumTo != repNumClosing){
+							temp = new Transfer(currUser, transCust, repNumClosing, repNumTo, transCust.getRepBal(repNumClosing));
+							currUser.setSecTrans(temp);
+							check = true;
+						}
 					}
 				}
 			}
+			
 			//extracts all of the souls from the account
 			if(choice == repSize+1 && allowExtr){
 				temp = new Extract(currUser, transCust, repNumClosing, transCust.getRepBal(repNumClosing));
@@ -88,7 +102,7 @@ public class CloseAccts extends Transactions {
 				customer = CustomerMenus.devilDealMenu(customer, false, donations);
 				check = true;*/
 			}
-			//Exits the menu
+			//Cancels the transaction
 			else if(choice == repSize+4){
 				transExit = true;
 			}
@@ -98,5 +112,6 @@ public class CloseAccts extends Transactions {
 				currUser.getSecTrans().startTrans();
 			}
 		}
+		return didRepHaveSouls;
 	}
 }
