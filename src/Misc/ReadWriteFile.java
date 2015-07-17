@@ -25,23 +25,9 @@ public class ReadWriteFile{
 		}
 	}
 	
-	public static void addRep(String repUserName, int repNum, String repType, Double repBal){
-		String filename = "Repositories.txt";
-		String FileData = repUserName + " " + repNum + " " + repType + " " + repBal;
-		
-		appendToFile(filename, FileData);
-	}
-	
-	public static void addUser(String customer, String userName, String pwd, String acctType, String firstName, String lastName){
-		String filename= "Users.txt";
-		String FileData = userName + " " + pwd + " " + acctType + " " + firstName + " " + lastName;
-		
-		appendToFile(filename, FileData);
-	}
-	
 	public static void replaceFile(String filename, String fileData){
 		try {
-			FileWriter fw = new FileWriter(filename); //the false will overwrite the file
+			FileWriter fw = new FileWriter(filename); //creates or overwrites the file
 			fw.write(fileData); //appends the string to the file
 			fw.close();
 		} catch (IOException e) {
@@ -60,119 +46,6 @@ public class ReadWriteFile{
 		}
 	}
 
-	public static int recordActiv(String currUser, String action){
-		String fileName = "UserActivity.txt";
-		String persLabel = "ActivityNum";
-		int activNum = findPersValInt(persLabel);
-		
-		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		Date date = new Date();
-		dateFormat.format(date);
-		
-		String record = currUser + " " + activNum + " " + dateFormat.format(date) + " " + action;
-		
-		appendToFile(fileName, record);
-		
-		updPersValInt(persLabel, activNum+1);
-		
-		return activNum;
-	}
-	
-	public static void recordRepActiv(int activNum, int repNum, String action, double transVal){
-		String fileName = "RepActivity.txt";
-		
-		String record = activNum + " " + repNum + " " + action + " " + transVal;
-		
-		appendToFile(fileName, record);
-	}
-	
-	/*public static void transferSouls(boolean addToRep, boolean subtrFromRep, int repNumAdd, int repNumSubtr, double transAmt){
-		String fileName = "Repositories.txt";
-		ArrayList<String> reps = new ArrayList<String>(); 
-		Scanner sc2 = null;
-		
-		// start file scanner
-		try {
-			sc2 = new Scanner(new File(fileName));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	
-		//reads all account data into the program, while adding or subtracting to balances depending on the transaction
-		while(sc2.hasNext()){
-			String userName = sc2.next(); 
-			int repNum = sc2.nextInt();
-			String repType = sc2.next();
-			double repBal = Double.parseDouble(sc2.next());
-	
-			if(repNumAdd == repNum && addToRep == true){
-				repBal = repBal + transAmt;
-			}
-			else if (repNumSubtr == repNum && subtrFromRep == true){
-				repBal = repBal - transAmt;
-			}
-	
-			StringBuilder temp = new StringBuilder(); 
-			
-			temp.append(userName).append(" ");
-			temp.append(repNum).append(" ");
-			temp.append(repType).append(" ");
-			temp.append(repBal);
-			
-			String temp2 = temp.toString();
-			
-			reps.add(temp2);
-		}
-		
-		sc2.close();
-		
-		//replaces file with the newly editted values
-		rewriteFile(fileName, reps);
-	}*/
-	
-	public static void addSubtrSouls(int transRepNum, double transAmt){
-		String fileName = "Repositories.txt";
-		ArrayList<String> reps = new ArrayList<String>(); 
-		Scanner sc2 = null;
-		
-		// start file scanner
-		try {
-			sc2 = new Scanner(new File(fileName));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	
-		//reads all account data into the program, while adding or subtracting to balances depending on the transaction
-		while(sc2.hasNext()){
-			String userName = sc2.next(); 
-			int repNum = sc2.nextInt();
-			String repType = sc2.next();
-			double repBal = Double.parseDouble(sc2.next());
-	
-			if(transRepNum == repNum){
-				repBal = repBal + transAmt;
-			}
-	
-			StringBuilder temp = new StringBuilder(); 
-			
-			temp.append(userName).append(" ");
-			temp.append(repNum).append(" ");
-			temp.append(repType).append(" ");
-			temp.append(repBal);
-			
-			String temp2 = temp.toString();
-			
-			reps.add(temp2);
-		}
-		
-		sc2.close();
-		
-		//replaces file with the newly editted values
-		rewriteFile(fileName, reps);
-	}
-	
 	public static ArrayList<User> loadUsers() {
 		ArrayList<User> users = new ArrayList<>();
 		Scanner sc1 = null;
@@ -212,6 +85,34 @@ public class ReadWriteFile{
 		return new User();
 	}
 	
+	public static void addUser(String userName, String pwd, String acctType, String firstName, String lastName){
+		String filename= "Users.txt";
+		String fileString = userStringBuilder(userName, pwd, acctType, firstName, lastName); 
+
+		appendToFile(filename, fileString);
+	}
+
+	public static void deleteUser(String userName){
+		ArrayList<User> allUsers = loadUsers();
+		boolean firstWrite = true;
+		String fileName = "Users.txt";
+		int userSize = allUsers.size();
+	
+		for(int i = 0; i < userSize; i++){
+			if(!userName.equals(allUsers.get(i).getUserName())){	
+				String temp = userStringBuilder(allUsers.get(i).getUserName(), allUsers.get(i).getPassword(), allUsers.get(i).getAcctType(), allUsers.get(i).getFirstName(), allUsers.get(i).getLastName()); 
+				
+				if(firstWrite == true){
+					ReadWriteFile.replaceFile(fileName, temp);
+					firstWrite = false;
+				}
+				else{
+					ReadWriteFile.appendToFile(fileName, temp);
+				}
+			}
+		}
+	}
+
 	public static ArrayList<Admin> loadAdmins() {
 		ArrayList<User> users = loadUsers();
 		ArrayList<Admin> admins = new ArrayList<>();
@@ -261,9 +162,22 @@ public class ReadWriteFile{
 		return new Customer();
 	}
 	
+	public static String userStringBuilder(String userName, String password, String acctType, String firstName, String lastName){
+		StringBuilder temp = new StringBuilder(); 
+		
+		temp.append(userName).append(" ");
+		temp.append(password).append(" ");
+		temp.append(acctType).append(" ");
+		temp.append(firstName).append(" ");
+		temp.append(lastName);
+
+		return temp.toString();
+	}
+	
 	public static ArrayList<Repositories> loadRep(String loadUserName) {
-		String fileName = "Repositories.txt";
 		ArrayList<Repositories> repositories = new ArrayList<>();
+		String fileName = "Repositories.txt";
+		
 		Scanner sc1 = null;
 		
 		try {
@@ -274,7 +188,7 @@ public class ReadWriteFile{
 		}
 		
 		while(sc1.hasNext()){
-			String inUserName = sc1.next();  //skips over usernames in the file
+			String inUserName = sc1.next();
 			String repNum = sc1.next();
 			String repType = sc1.next();
 			String balance = sc1.next();
@@ -320,6 +234,128 @@ public class ReadWriteFile{
 		return repositories;
 	}
 
+	/*public static void transferSouls(boolean addToRep, boolean subtrFromRep, int repNumAdd, int repNumSubtr, double transAmt){
+		String fileName = "Repositories.txt";
+		ArrayList<String> reps = new ArrayList<String>(); 
+		Scanner sc2 = null;
+		
+		// start file scanner
+		try {
+			sc2 = new Scanner(new File(fileName));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		//reads all account data into the program, while adding or subtracting to balances depending on the transaction
+		while(sc2.hasNext()){
+			String userName = sc2.next(); 
+			int repNum = sc2.nextInt();
+			String repType = sc2.next();
+			double repBal = Double.parseDouble(sc2.next());
+	
+			if(repNumAdd == repNum && addToRep == true){
+				repBal = repBal + transAmt;
+			}
+			else if (repNumSubtr == repNum && subtrFromRep == true){
+				repBal = repBal - transAmt;
+			}
+	
+			StringBuilder temp = new StringBuilder(); 
+			
+			temp.append(userName).append(" ");
+			temp.append(repNum).append(" ");
+			temp.append(repType).append(" ");
+			temp.append(repBal);
+			
+			String temp2 = temp.toString();
+			
+			reps.add(temp2);
+		}
+		
+		sc2.close();
+		
+		//replaces file with the newly editted values
+		rewriteFile(fileName, reps);
+	}*/
+	
+	public static void addRep(String repUserName, int repNum, String repType, Double repBal){
+		String filename = "Repositories.txt";
+		String FileData = repStringBuilder(repUserName, repNum, repType, repBal);
+		
+		appendToFile(filename, FileData);
+	}
+
+	public static void deleteRep(int repNum){
+		ArrayList<Customer> customers = loadCustomers(); 
+		boolean firstWrite = true;
+		String fileName = "Repositories.txt";
+		int custSize = customers.size();
+		int RepSize = 0;
+		
+		for(int i = 0; i < custSize; i++){
+			RepSize = customers.get(i).getRep().size();
+			for(int j = 0; j < RepSize; j++){
+				int repNum2 = customers.get(i).getRepNum(j);
+				if(repNum != repNum2){	
+					String temp = repStringBuilder(customers.get(i).getUserName(), repNum2, customers.get(i).getRepType(repNum2),customers.get(i).getRepBal(repNum2));
+					
+					if(firstWrite == true){
+						ReadWriteFile.replaceFile(fileName, temp);
+						firstWrite = false;
+					}
+					else{
+						ReadWriteFile.appendToFile(fileName, temp);
+					}
+				}
+			}
+		}
+	}
+
+	public static void addSubtrSouls(int transRepNum, double transAmt){
+		String fileName = "Repositories.txt";
+		ArrayList<String> reps = new ArrayList<String>(); 
+		Scanner sc2 = null;
+		
+		// start file scanner
+		try {
+			sc2 = new Scanner(new File(fileName));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		//reads all account data into the program, while adding or subtracting to balances depending on the transaction
+		while(sc2.hasNext()){
+			String userName = sc2.next(); 
+			int repNum = sc2.nextInt();
+			String repType = sc2.next();
+			double repBal = Double.parseDouble(sc2.next());
+	
+			if(transRepNum == repNum){
+				repBal = repBal + transAmt;
+			}
+			
+			reps.add(repStringBuilder(userName, repNum, repType, repBal));
+		}
+		
+		sc2.close();
+		
+		//replaces file with the newly editted values
+		rewriteFile(fileName, reps);
+	}
+
+	public static String repStringBuilder(String userName, int repNum, String repType, Double repBal){
+		StringBuilder temp = new StringBuilder(); 
+		
+		temp.append(userName).append(" ");
+		temp.append(repNum).append(" ");
+		temp.append(repType).append(" ");
+		temp.append(repBal);
+		
+		return temp.toString();
+	}
+
 	public static ArrayList<PersVals> loadPersVals(){
 		ArrayList<PersVals> persVals = new ArrayList<>();
 		Scanner sc1 = null;
@@ -345,6 +381,33 @@ public class ReadWriteFile{
 		return persVals;
 	}
 	
+	public static void updPersValInt(String persLabel, int newVal){
+		updPersValStr(persLabel, Integer.toString(newVal));
+	}
+
+	public static void updPersValStr(String persLabel, String newVal){
+		ArrayList<PersVals> persVals = loadPersVals();
+		ArrayList<String> newPersVals = new ArrayList<>();
+		int persSize = persVals.size();
+	
+		for(int i=0; i<persSize; i++){
+			StringBuilder temp = new StringBuilder();
+			String valLabel = persVals.get(i).getLabel();
+			if (!valLabel.equals(persLabel)){
+				temp.append(valLabel).append(" ");
+				temp.append(persVals.get(i).getValueStr());
+			}
+			else{
+				temp.append(valLabel).append(" ");
+				temp.append(newVal);
+			}	
+			
+			String temp2 = temp.toString();
+			newPersVals.add(temp2);
+		}
+		rewriteFile("PersistentVals.txt", newPersVals);
+	}
+
 	public static ArrayList<RepActiv> loadRepActiv(int loadRepNum){
 		ArrayList<RepActiv> repActiv = new ArrayList<>();
 		Scanner sc1 = null;
@@ -373,6 +436,12 @@ public class ReadWriteFile{
 		return repActiv;
 	}
 	
+	public static void writeRepActiv(int activNum, int repNum, String action, double transVal){
+		String fileName = "RepActivity.txt";
+		String record = activNum + " " + repNum + " " + action + " " + transVal;
+		appendToFile(fileName, record);
+	}
+
 	public static UserActiv loadUserActiv(int currActivNum){
 		Scanner sc1 = null;
 		
@@ -403,6 +472,34 @@ public class ReadWriteFile{
 		return null;
 	}
 	
+	public static void writeUserActiv(int activNum, String currUser, String action){
+		String fileName = "UserActivity.txt";
+		
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		Date date = new Date();
+		dateFormat.format(date);
+		
+		String record = currUser + " " + activNum + " " + dateFormat.format(date) + " " + action;
+		appendToFile(fileName, record);
+	}
+
+	public static int recordUserRepActiv(String currUserName, String action, int repNum, double transVal){
+		String persLabel = "ActivityNum";
+		int activNum = findPersValInt(persLabel);
+		writeUserActiv(activNum, currUserName, action);
+		writeRepActiv(activNum, repNum, action, transVal);
+		updPersValInt(persLabel, activNum+1);
+		return activNum;
+	}
+
+	public static int recordUserActiv(String currUserName, String action){
+		String persLabel = "ActivityNum";
+		int activNum = findPersValInt(persLabel);
+		writeUserActiv(activNum, currUserName, action);
+		updPersValInt(persLabel, activNum+1);
+		return activNum;
+	}
+
 	public static int findPersValInt(String label){
 		ArrayList<PersVals> persVals = loadPersVals();
 		int persSize = persVals.size();
@@ -415,95 +512,6 @@ public class ReadWriteFile{
 		return -1;
 	}
 	
-	public static void updPersValInt(String persLabel, int newVal){
-		updPersValStr(persLabel, Integer.toString(newVal));
-	}
-	
-	public static void updPersValStr(String persLabel, String newVal){
-		ArrayList<PersVals> persVals = loadPersVals();
-		ArrayList<String> newPersVals = new ArrayList<>();
-		int persSize = persVals.size();
-
-		for(int i=0; i<persSize; i++){
-			StringBuilder temp = new StringBuilder();
-			String valLabel = persVals.get(i).getLabel();
-			if (!valLabel.equals(persLabel)){
-				temp.append(valLabel).append(" ");
-				temp.append(persVals.get(i).getValueStr());
-			}
-			else{
-				temp.append(valLabel).append(" ");
-				temp.append(newVal);
-			}	
-			
-			String temp2 = temp.toString();
-			newPersVals.add(temp2);
-		}
-		rewriteFile("PersistentVals.txt", newPersVals);
-	}
-
-	public static void deleteRep(int repNum){
-		ArrayList<Customer> customers = loadCustomers(); 
-		boolean firstWrite = true;
-		String fileName = "Repositories.txt";
-		int custSize = customers.size();
-		int RepSize = 0;
-		
-		for(int i = 0; i < custSize; i++){
-			RepSize = customers.get(i).getRep().size();
-			for(int j = 0; j < RepSize; j++){
-				int repNum2 = customers.get(i).getRepNum(j);
-				if(repNum != repNum2){	
-					StringBuilder temp = new StringBuilder(); 
-					
-					temp.append(customers.get(i).getUserName()).append(" ");
-					temp.append(repNum2).append(" ");
-					temp.append(customers.get(i).getRepType(repNum2)).append(" ");
-					temp.append(customers.get(i).getRepBal(repNum2));
-					
-					String temp2 = temp.toString();
-					
-					if(firstWrite == true){
-						ReadWriteFile.replaceFile(fileName, temp2);
-						firstWrite = false;
-					}
-					else{
-						ReadWriteFile.appendToFile(fileName, temp2);
-					}
-				}
-			}
-		}
-	}
-
-	public static void deleteUser(String userName){
-		ArrayList<User> allUsers = loadUsers();
-		boolean firstWrite = true;
-		String fileName = "Users.txt";
-		int userSize = allUsers.size();
-
-		for(int i = 0; i < userSize; i++){
-			if(!userName.equals(allUsers.get(i).getUserName())){	
-				StringBuilder temp = new StringBuilder(); 
-				
-				temp.append(allUsers.get(i).getUserName()).append(" ");
-				temp.append(allUsers.get(i).getPassword()).append(" ");
-				temp.append(allUsers.get(i).getAcctType()).append(" ");
-				temp.append(allUsers.get(i).getFirstName()).append(" ");
-				temp.append(allUsers.get(i).getLastName());
-
-				String temp2 = temp.toString();
-
-				if(firstWrite == true){
-					ReadWriteFile.replaceFile(fileName, temp2);
-					firstWrite = false;
-				}
-				else{
-					ReadWriteFile.appendToFile(fileName, temp2);
-				}
-			}
-		}
-	}
-
 	public static void donateToDarkOnes(String custUserName, double transVal){
 		String fileName = "DarkOnes.txt";
 		ArrayList<String> darkDons = new ArrayList<String>();

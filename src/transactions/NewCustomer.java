@@ -6,26 +6,27 @@ import users.Customer;
 
 
 public class NewCustomer extends Transactions {
+	String inUserName;
+	String inPassword;
+	String inFirstName;
+	String inLastName;
 	
 	public NewCustomer(){
 		super();
 		transaction = "newCustomer";
 	}
 	
-	public void createNewCust(String currUser){
+	public boolean startTrans(){
 		System.out.println("To create a new account, we need a username, password, first and last name.");
 		System.out.println("Enter 'back' to go back to the login screen.");
 	
-		String inUserName = newUserName(5, 10); //min userName length should more than 5 or more since "null" is used as a filler
-		String inPassword = newPassword(5, 10); //min password length should more than 5 or more since "null" is used as a filler
-		String inFirstName = inputName("Your first name", 50);
-		String inLastName = inputName("your last name", 50);
+		inUserName = newUserName(5, 10); //min userName length should more than 5 or more since "null" is used as a filler
+		inPassword = newPassword(5, 10); //min password length should more than 5 or more since "null" is used as a filler
+		inFirstName = inputName("Your first name", 50);
+		inLastName = inputName("your last name", 50);
 		
-		if(transExit == false){
-			ReadWriteFile.addUser(inUserName, inUserName, inPassword, "Cust", inFirstName, inLastName);
-			ReadWriteFile.recordActiv(currUser, "NewCust:" + inUserName);
-			System.out.println("Congratulations on opening a new Account");
-		}
+		doTrans();
+		return transExit;
 	}
 
 	private String newUserName(int minLen, int maxLen){
@@ -115,5 +116,12 @@ public class NewCustomer extends Transactions {
 			}
 		} 
 		return false;
+	}
+	
+	public void doTrans(){
+		if(transExit == false){
+			ReadWriteFile.addUser(inUserName, inPassword, "Cust", inFirstName, inLastName);
+			ReadWriteFile.recordUserActiv(currUser.getUserName(), "NewCust:" + inUserName);
+		}
 	}
 }

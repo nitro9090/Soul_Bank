@@ -1,6 +1,5 @@
 package transactions;
 
-import Misc.ExitMethods;
 import Misc.MiscMeth;
 import Misc.ReadWriteFile;
 import Misc.UserInputMethods;
@@ -18,7 +17,7 @@ public class CloseRep extends CloseAccts {
 		repNum1 = delRepNum;
 	}
 	
-	public void startTrans(){
+	public boolean startTrans(){
 		requiredReps(1);
 		verifyUser();
 		chooseRep();
@@ -26,6 +25,7 @@ public class CloseRep extends CloseAccts {
 		doubleCheck();
 		doTrans();
 		transComplete();
+		return transExit;
 	}
 	
 	private void verifyUser(){
@@ -66,9 +66,8 @@ public class CloseRep extends CloseAccts {
 		if(!transExit && check && authenticated){
 			delRepType = transCust.getRepType(repNum1);
 			ReadWriteFile.deleteRep(repNum1);
-			int activNum = ReadWriteFile.recordActiv(currUser.getUserName(), transaction);
-			ReadWriteFile.recordRepActiv(activNum, repNum1, transaction, 0);
-
+			ReadWriteFile.recordUserRepActiv(currUser.getUserName(), transaction, repNum1, 0);
+				
 			currUser.refreshRepList();
 			transCust.refreshRepList();
 		}

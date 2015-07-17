@@ -1,7 +1,5 @@
 package transactions;
 
-import java.util.ArrayList;
-
 import Misc.MiscMeth;
 import Misc.UserInputMethods;
 import users.Customer;
@@ -44,7 +42,6 @@ public class Transactions {
 	public void setRepNum1(int repNum){
 		repNum1 = repNum;
 	}
-
 
 	public String getCurrUserName(){
 		return currUser.getUserName();
@@ -133,9 +130,10 @@ public class Transactions {
 		return -1;
 	}
 
-	public void startTrans(){
+	public boolean startTrans(){
 		System.out.println("This transaction is not setup.");
 		transExit = true;
+		return transExit;
 	}
 	
 	public void transDesc(){

@@ -17,7 +17,7 @@ public class ExitMethods {
 	public static void exitNormal(String value, String userName){
 		if(value.equals("escape")){
 			if (userName != null){
-				ReadWriteFile.recordActiv(userName, "NormalLogout");
+				ReadWriteFile.recordUserActiv(userName, "NormalLogout");
 			}
 			System.out.println("Goodbye, for now...");
 			System.exit(0);
@@ -30,7 +30,7 @@ public class ExitMethods {
 	 */
 	public static void exitCommBad(){
 		System.out.println("You have been bad, now begone.");
-		ReadWriteFile.recordActiv("null", "BadLogin");
+		ReadWriteFile.recordUserActiv("null", "BadLogin");
 		System.exit(0);
 	}
 }

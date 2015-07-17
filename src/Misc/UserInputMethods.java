@@ -2,10 +2,6 @@ package Misc;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-import java.applet.*;
-import java.awt.*;
-import java.awt.event.*;
-
 public class UserInputMethods {
 	static Scanner sc = new Scanner(System.in);
 

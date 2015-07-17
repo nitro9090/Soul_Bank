@@ -1,8 +1,6 @@
-import Misc.ExitMethods;
 import Misc.MiscMeth;
 import Misc.UserInputMethods;
-import transactions.NewCustomer;
-import transactions.Transactions;
+import transactions.*;
 import users.Admin;
 import users.Customer;
 import users.User;
@@ -40,7 +38,7 @@ public class Main {
 			switch (choice) {
 			case 1: 
 				NewCustomer newCust = new NewCustomer();
-				newCust.createNewCust(null);
+				newCust.startTrans();
 				System.out.println("try logging in with your new account.");
 			case 2:
 				while(!userAuthenticated && !exit){

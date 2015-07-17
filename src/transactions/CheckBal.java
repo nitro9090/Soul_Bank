@@ -14,8 +14,9 @@ public class CheckBal extends Transactions{
 		super(currUser, checkCust, "CheckBal");
 	}
 	
-	public void startTrans(){
+	public boolean startTrans(){
 		checkBalMenu();
+		return transExit;
 	}
 	
 	private void checkBalMenu() {
@@ -61,7 +62,6 @@ public class CheckBal extends Transactions{
 		int repStart = repActivSize-1;
 		
 		boolean listOver = false;
-		
 		
 		while(!listOver && !transExit){
 			int repEnd = repStart - repStep+1;
@@ -114,7 +114,6 @@ public class CheckBal extends Transactions{
 			else MiscMeth.invSelect();
 		}
 		
-		String temp = "CheckBal:" + repNum;
-		ReadWriteFile.recordActiv(transCust.getUserName(), temp);
+		ReadWriteFile.recordUserActiv(transCust.getUserName(), "CheckBal:" + repNum);
 	}
 }

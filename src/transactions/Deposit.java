@@ -8,13 +8,14 @@ public class Deposit extends TransExtDep{
 		super(currUser, DepCust, "Deposit");
 	}
 	
-	public void startTrans(){
+	public boolean startTrans(){
 		requiredReps(1);
 		repNum1 = chooseARep(true,repNum1,-1,-1, "Which repository would you like to deposit souls into?");
 		amtToTrans();
 		doubleCheck();
 		doTransfer();
 		transComplete();
+		return transExit;
 	}
 	
 	private void amtToTrans(){
@@ -38,9 +39,9 @@ public class Deposit extends TransExtDep{
 	
 	public void doTransfer(){
 		if(!transExit){
-			int activNum = ReadWriteFile.recordActiv(currUser.getUserName(), transaction);
 			ReadWriteFile.addSubtrSouls(repNum1, transVal);
-			ReadWriteFile.recordRepActiv(activNum, repNum1, transaction, transVal);
+			ReadWriteFile.recordUserRepActiv(currUser.getUserName(), transaction, repNum1, transVal);
+			
 			currUser.refreshRepList();
 			transCust.refreshRepList();
 		}

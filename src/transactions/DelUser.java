@@ -1,6 +1,5 @@
 package transactions;
 
-import Misc.ExitMethods;
 import Misc.MiscMeth;
 import Misc.ReadWriteFile;
 import Misc.UserInputMethods;
@@ -13,12 +12,13 @@ public class DelUser extends CloseAccts {
 		super(currUser, closingUser, "DelUser");
 	}
 	
-	public void startTrans(){
+	public boolean startTrans(){
 		verifyUser();
 		doubleCheck();
 		emptyRepsWSouls();
 		doubledoubleCheck();
 		deleteUser();
+		return transExit;
 	}
 	
 	private void verifyUser(){
@@ -83,7 +83,7 @@ public class DelUser extends CloseAccts {
 			}
 			
 			ReadWriteFile.deleteUser(transCust.getUserName());
-			ReadWriteFile.recordActiv(transCust.getUserName(), transaction);
+			ReadWriteFile.recordUserActiv(transCust.getUserName(), transaction);
 			
 			System.out.println(transCust.getUserName() + "'s customer account has been closed");
 			

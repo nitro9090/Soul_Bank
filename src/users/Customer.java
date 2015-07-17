@@ -83,7 +83,7 @@ public class Customer extends User{
 	public void mainMenu(){
 		//The main menu for a customer, it lists all of the customer's account options.
 	
-		System.out.println("Welcome to the main menu, what would you like to do?");
+		System.out.println("Welcome " + userName + " to the main menu, what would you like to do?");
 		
 		while (!mainExit){
 			//nulls out any previous transactions
@@ -96,7 +96,8 @@ public class Customer extends User{
 			System.out.println("(3) Transfer/extract/deposit souls");
 			System.out.println("(4) Close repository/account");
 			System.out.println("(5) Make a deal with the devil");
-			System.out.println("(6) Logout");
+			System.out.println("(6) Change account information");
+			System.out.println("(7) Logout");
 			System.out.println("(escape) at any time to exit the program");
 			int choice = UserInputMethods.scanInt(userName);
 			switch (choice) {
@@ -116,6 +117,9 @@ public class Customer extends User{
 				//customer = devilDealMenu(customer, true, null);
 				break;
 			case 6:
+				changeAcctsMenu();
+				break;
+			case 7:
 				mainExit = true;
 				break;
 			default:
@@ -197,58 +201,17 @@ public class Customer extends User{
 		}
 	}
 	
-	public String newRepMenu(){	
-		while (!currTrans.getTransExit()){
-			System.out.println("What kind of repository would you like to open?");
-			System.out.println("(1) Soul checking (easily access your souls through dark rituals)");
-			System.out.println("(2) Soul growth (through close proximity your souls will grow off one another)");
-			System.out.println("(3) Soul investment (We will pool your souls and trade them in the free market");
-			System.out.println("(4) Return to previous menu");
-
-			int choice = UserInputMethods.scanInt(userName);
-			switch (choice) {
-			case 1: 
-				return "checking";
-			case 2:
-				return "growth";
-			case 3:
-				return "invest";
-			case 4:
-				currTrans.setTransExit(true);
-				return "null";
-			default:
-				MiscMeth.invSelect();
-			}
-		}
-		return "null";
+	private void changeAcctsMenu() {
+		// TODO Auto-generated method stub
+		
 	}
-	
-	public void newRepMenu(Transactions transOpenRep){	
-		while (!currTrans.getTransExit()){
-			System.out.println("What kind of repository would you like to open?");
-			System.out.println("(1) Soul checking (easily access your souls through dark rituals)");
-			System.out.println("(2) Soul growth (through close proximity your souls will grow off one another)");
-			System.out.println("(3) Soul investment (We will pool your souls and trade them in the free market");
-			System.out.println("(4) Return to previous menu");
 
-			int choice = UserInputMethods.scanInt(userName);
-			switch (choice) {
-			case 1: 
-				transOpenRep.setRepType("checking");
-				return;
-			case 2:
-				transOpenRep.setRepType("growth");
-				return;
-			case 3:
-				transOpenRep.setRepType("invest");
-				return;
-			case 4:
-				currTrans.setTransExit(true);
-				return;
-			default:
-				MiscMeth.invSelect();
-			}
-		}
+	public void newRepMenuDial(){	
+		System.out.println("What kind of repository would you like to open?");
+		System.out.println("(1) Soul checking (easily access your souls through dark rituals)");
+		System.out.println("(2) Soul growth (through close proximity your souls will grow off one another)");
+		System.out.println("(3) Soul investment (We will pool your souls and trade them in the free market");
+		System.out.println("(4) Return to previous menu");
 	}
 
 	public int listReps(boolean printList, boolean inclEmptReps, int skipRepNum1, int skipRepNum2, int skipRepNum3){
@@ -269,50 +232,6 @@ public class Customer extends User{
 		return countReps;
 	}
 	
-	private void closeRepPrompt(Customer customer, boolean finalTrans) {
-		int repSize = customer.getRep().size();
-		String action = "CloseRep";
-		
-		if (repSize == 0){
-			System.out.println("You do not have any acccounts to close, returning to the previous menu.");
-			exit = true;
-		}
-		
-		int delRepNum = chooseRepPrompt(customer, false, true, "Which repository would you like to close?");
-		repHasSoul(customer, delRepNum, true, true, true, true);
-		actionDoubleCheck(action, finalTrans, 0, delRepNum, -1, null);
-	}
-
-	private void closeCustPrompt(String customerToDel, boolean finalTrans) {
-		// make sure the customer wants to close their account	
-		actionDoubleCheck("1stCloseCustCheck", false, -1, -1, -1, null);
-		boolean allEmptReps = true;
-	
-		//check to see if the account has any repositories with souls in it, if there are they are asked what to do with the souls in each account.
-		if (exit == false){
-			Customer delCustomer = ReadWriteFile.loadCustomer(customerToDel);
-			for (int i = 0; i < delCustomer.getRep().size(); i++){
-				int repNumList = delCustomer.getRepNum(i);
-				if (delCustomer.getRepBal(repNumList) > 0 && allEmptReps == false){
-					System.out.println("You still have souls in your repositories, you will need to empty each one before closing your account.");
-					allEmptReps = false;
-				}
-				if(delCustomer.getRepBal(repNumList) > 0){
-					ArrayList<Donations> donations = new ArrayList<>();
-					Donations temp = new Donations(repNumList, customer.getRepBal(repNumList));
-					donations.add(temp);
-					repHasSoul(repNumList, false, true, false, true);
-				}
-			}
-		}
-	
-		// Make sure the customer really want to close the account, if they do then the customer account is closed.
-		actionDoubleCheck("2ndCloseCustCheck", true, -1, -1, -1, null);
-		if(finalTrans == true) exit = false;
-	}
-
-
-
 	static Customer devilDealMenu(Customer customer, boolean finalTrans, ArrayList<Donations> donations) {
 		breakWhile:
 			while(exit == false){
@@ -352,7 +271,5 @@ public class Customer extends User{
 		int activNum = ReadWriteFile.recordActiv(donUserName, action);
 		ReadWriteFile.recordRepActiv(activNum, repNum, action, -transVal);
 		System.out.println(transVal + " souls have been donated from " + donUserName + "'s " + repNum + " " + getRepType(repNum) +  " account.");
-	}
-
-	
+	}	
 }

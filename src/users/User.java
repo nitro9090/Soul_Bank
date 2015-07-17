@@ -48,6 +48,11 @@ public class User {
 		lastName = lN;
 	}
 	
+	public static User createUser(){
+		User temp = new User();
+		return temp;
+	}
+	
 	public String getUserName(){
 		return userName;
 	}
@@ -130,7 +135,7 @@ public class User {
 
 	
 	protected static void backMain() {
-		System.out.println("Welcome back to the main menu, your options are:");
+		if(!mainExit)System.out.println("Welcome back to the main menu, your options are:");
 	}
 	
 	public static void returnToMainDial(){
@@ -148,6 +153,10 @@ public class User {
 		mainExit = true;
 	}
 
+	public void newRepMenuDial(){	
+		System.out.println("Error:NewRepMenuDial not implemented for this user type.");
+	}
+	
 	public void amtToTransDial() {
 		System.out.println("Error: The dialogue for transfer amounts has been setup");
 	}
@@ -352,91 +361,5 @@ public class User {
 		customer = dealDoubleCheck(customer, true, dealType, donations);
 		
 		return customer;
-	}
-
-	
-
-	protected static void checkRepActiv(int repNum, Customer customer) {
-		String action = "CheckRep";
-		
-		System.out.printf("The current balance of your soul %s repository # %d is %.2f souls \n", customer.getRepType(repNum), repNum,  customer.getRepBal(repNum));
-		int activNum = ReadWriteFile.recordActiv(customer.getUserName(), action);
-		ReadWriteFile.recordRepActiv(activNum, repNum, action, 0);
-	}
-
-	private void actionDoubleCheck(String action, boolean finalTrans, double transVal, Repositories repsTo, Repositories repsFrom, String repType){
-		breakWhile:
-		while (mainExit == false){
-			if(action.equals("Transfer")){
-				System.out.println("After transferring " + transVal + " souls, your account totals will be");
-				System.out.printf("account %d %s : %.2f souls     account %d %s : %.2f souls \n", repsFrom.getRepNum(), repsFrom.getRepType(), repsFrom.getRepBal()-transVal, repsTo.getRepNum(), repsTo.getRepType(), repsTo.getRepBal()+transVal);
-				System.out.println("Are you sure you want to do this? type (Y) for yes or (N) for no.");
-			}
-			else if(action.equals("Deposit")){
-				System.out.println("After depositing " + transVal + " souls, your account total will be");
-				System.out.printf("account %d %s : %.2f souls \n", repsTo.getRepNum(), repsTo.getRepType(), repsTo.getRepBal()+transVal);
-				System.out.println("Are you sure you want to do this? type (Y) for yes or (N) for no.");
-			}
-			else if(action.equals("Extract")){
-				System.out.println("After extracting " + transVal + " souls, your account total will be");
-				System.out.printf("account %d %s : %.2f souls \n", repsFrom.getRepNum(), repsFrom.getRepType(), repsFrom.getRepBal()-transVal);
-				System.out.println("Are you sure you want to do this? type (Y) for yes or (N) for no.");
-			}
-			else if(action.equals("NewRep")){
-				System.out.println("Are you sure you want to open a new Soul " + repType + " account? type (Y) for yes or (N) for no.");
-			}
-			else if (action.equals("CloseRep")){
-				System.out.println("You will now be closing " + repsTo.getUserName() + "'s account # : " + repsTo.getRepNum() + " soul " + repsTo.getRepType());
-				System.out.println("Are you sure you want to do this? type (Y) for yes or (N) for no.");
-			}
-			else if(action.equals("1stCloseCustCheck")){
-				System.out.println("You are about to close your customer account, aka delete it forever.");
-				System.out.println("Are you sure you wish to do this? type (Y) for yes or (N) for no.");
-			}
-			else if(action.equals("2ndCloseCustCheck")){
-				System.out.println("Once again, you are about to close your customer account, aka delete it forever.");
-				System.out.println("type (Y) to delete your account or (N) for to cancel the transaction.");
-			}
-			else{
-				System.out.println("Error: action double check wasn't accessed properly");
-				mainExit = true;
-				break breakWhile;
-			}
-			
-			String isYN = inputYN();
-			
-			if(isYN.equals("Y")){
-				if(action.equals("Transfer")){
-					transSouls(repsTo.getRepNum(), repsFrom.getRepNum(), transVal);
-					System.out.println(transVal + " souls have been transferred between your accounts.");
-				}
-				else if(action.equals("Deposit")){
-					depSouls(repsTo.getRepNum(), transVal);
-					System.out.println(transVal + " souls have been deposited into your account.");
-				}
-				else if(action.equals("Extract")){
-					extractSouls(repsFrom.getRepNum(), transVal);
-					System.out.println(transVal + " souls have been extracted from your account.");
-				}
-				else if (action.equals("NewRep")){
-					newRep(userName, repType, 0);
-					System.out.println("A new " + repType + " account has been created with an initial balance of 0 souls");
-				}
-				else if(action.equals("CloseRep")){
-					deleteRep(repsTo.getRepNum());
-					System.out.printf("Repository # %d has been closed\n", repsTo.getRepNum());
-	
-				}
-				else if(action.equals("1stCloseCustCheck")){
-				}
-				else if(action.equals("2ndCloseCustCheck")){
-					deleteUser(userName);
-				}
-				break breakWhile;
-			}
-			else if(isYN.equals("N")){
-				mainExit = true;
-			}	
-		}
 	}
 }

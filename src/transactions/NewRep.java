@@ -1,6 +1,8 @@
 package transactions;
 
+import Misc.MiscMeth;
 import Misc.ReadWriteFile;
+import Misc.UserInputMethods;
 import users.*;
 
 public class NewRep extends Transactions {
@@ -14,12 +16,35 @@ public class NewRep extends Transactions {
 		newRepType = repType;
 	}
 	
-	public void startTrans(){
-		newRepType = currUser.newRepMenu();
+	public boolean startTrans(){
+		newRepType = newRepMenu();
 		doubleCheckTrans();
 		doTrans();
 		transComplete();
+		return transExit;
 	}
+	
+	private String newRepMenu(){
+		while(!transExit){
+			currUser.newRepMenuDial();
+			int choice = UserInputMethods.scanInt(currUser.getUserName());
+			switch (choice) {
+			case 1: 
+				return "checking";
+			case 2:
+				return "growth";
+			case 3:
+				return "invest";
+			case 4:
+				transExit = true;
+				return "null";
+			default:
+				MiscMeth.invSelect();
+			}
+		}
+		return "null";
+	}
+	
 
 	private void doubleCheckTrans(){
 		while (!transExit){
@@ -42,11 +67,10 @@ public class NewRep extends Transactions {
 			
 			ReadWriteFile.addRep(transCust.getUserName(), repNum1, newRepType, transVal);
 			
-			int activNum = ReadWriteFile.recordActiv(currUser.getUserName(), transaction);
-			ReadWriteFile.recordRepActiv(activNum, repNum1, transaction, transVal);
+			ReadWriteFile.recordUserRepActiv(currUser.getUserName(), transaction, repNum1, transVal);
 			
 			currUser.refreshRepList();
-			transCust.refreshRepList();			
+			transCust.refreshRepList();	
 		}
 	}
 	

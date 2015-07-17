@@ -18,13 +18,13 @@ public class MiscMeth {
 		for(int i = 0; i<users.size(); i++){
 			if (inUserName.equals(users.get(i).getUserName())){
 				if (inPassword.equals(users.get(i).getPassword())){
-					ReadWriteFile.recordActiv(inUserName, "PassedAuth-"+transaction+"-" + inUserName);
+					ReadWriteFile.recordUserActiv(inUserName, "PassedAuth-"+transaction+"-" + inUserName);
 					return true;
 				}
 			}
 			else if(i == users.size()-1){
 				System.out.println("Username and/or password do not match or exist, try again.");
-				ReadWriteFile.recordActiv(inUserName, "FailedAuth:"+transaction+"-" + inUserName);
+				ReadWriteFile.recordUserActiv(inUserName, "FailedAuth:"+transaction+"-" + inUserName);
 				return false;
 			}
 		}

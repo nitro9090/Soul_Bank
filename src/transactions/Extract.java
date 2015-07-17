@@ -15,7 +15,7 @@ public class Extract extends TransExtDep {
 		transVal = transAmt;
 	}
 	
-	public void startTrans(){
+	public boolean startTrans(){
 		requiredReps(2);
 		if(repNum2 == -1){
 			repNum2 = chooseARep(true, -1,-1,-1,"Which repository would you like to extract souls from?");
@@ -26,6 +26,7 @@ public class Extract extends TransExtDep {
 		doubleCheck();
 		doTransfer();
 		transComplete();
+		return transExit;
 	}
 	
 	private void amtToTrans(){
@@ -49,9 +50,8 @@ public class Extract extends TransExtDep {
 	
 	public void doTransfer(){
 		if(!transExit){
-			int activNum = ReadWriteFile.recordActiv(currUser.getUserName(), transaction);
 			ReadWriteFile.addSubtrSouls(repNum2, -transVal);
-			ReadWriteFile.recordRepActiv(activNum, repNum2, transaction, -transVal);
+			ReadWriteFile.recordUserRepActiv(currUser.getUserName(), transaction, repNum2, -transVal);
 			currUser.refreshRepList();
 			transCust.refreshRepList();
 		}

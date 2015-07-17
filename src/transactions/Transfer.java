@@ -1,8 +1,6 @@
 package transactions;
 
-import Misc.MiscMeth;
 import Misc.ReadWriteFile;
-import Misc.UserInputMethods;
 import users.*;
 
 public class Transfer extends TransExtDep {
@@ -21,7 +19,7 @@ public class Transfer extends TransExtDep {
 	}
 	
 	
-	public void startTrans(){
+	public boolean startTrans(){
 		requiredReps(2);
 		if(repNum2 == -1){
 			repNum2 = chooseARep(false, -1,-1,-1,"Which repository would you like to transfer souls from?");
@@ -35,6 +33,7 @@ public class Transfer extends TransExtDep {
 		doubleCheck();
 		doTrans();
 		transComplete();
+		return transExit;
 	}
 	
 	private void amtToTrans(){
@@ -59,11 +58,10 @@ public class Transfer extends TransExtDep {
 	
 	protected void doTrans(){
 		if(!transExit){
-			int activNum = ReadWriteFile.recordActiv(currUser.getUserName(), transaction);
 			ReadWriteFile.addSubtrSouls(repNum1, transVal);
-			ReadWriteFile.recordRepActiv(activNum, repNum1, transaction, transVal);
+			int activNum =ReadWriteFile.recordUserRepActiv(currUser.getUserName(), transaction, repNum1, transVal);
 			ReadWriteFile.addSubtrSouls(repNum2, -transVal);
-			ReadWriteFile.recordRepActiv(activNum, repNum2, transaction, -transVal);
+			ReadWriteFile.writeRepActiv(activNum, repNum2, transaction, -transVal);
 			currUser.refreshRepList();
 			transCust.refreshRepList();
 		}
